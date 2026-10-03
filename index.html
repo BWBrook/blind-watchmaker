@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Blind Watchmaker</title>
+    <meta name="description" content="Browser recreations of Richard Dawkins' Blind Watchmaker biomorph program, for teaching evolution." />
+    <style>
+      :root { --bg: #f6f3ec; --ink: #1d1b16; --muted: #5d584c; --rule: #d8d2c4; --link: #1d4f91; }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme='light']) { --bg: #1b1a17; --ink: #ece7db; --muted: #a49d8d; --rule: #3a372f; --link: #8db4ea; }
+      }
+      body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.55 Georgia, 'Iowan Old Style', serif; }
+      main { max-width: 40rem; margin: 0 auto; padding: 3rem 1rem 4rem; }
+      h1 { font-size: 2rem; margin: 0 0 0.25rem; }
+      .lede { color: var(--muted); margin-top: 0; }
+      a { color: var(--link); }
+      .card { display: block; border: 1px solid var(--rule); border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; text-decoration: none; color: inherit; }
+      .card:hover { border-color: var(--link); }
+      .card strong { color: var(--link); font-size: 1.15rem; }
+      small { color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Blind Watchmaker</h1>
+      <p class="lede">Richard Dawkins' biomorphs, for teaching cumulative selection.</p>
+      <a class="card" href="classic/">
+        <strong>Classic (1986)</strong><br />
+        The original Macintosh program, recreated pixel for pixel from the behaviour of Dawkins' Pascal source (version 1.1, 1993).
+      </a>
+      <p><small>An independent educational recreation, not affiliated with Richard Dawkins or his publishers. Chicago and Geneva pixel fonts by Giles Booth, CC BY.</small></p>
+    </main>
+  </body>
+</html>

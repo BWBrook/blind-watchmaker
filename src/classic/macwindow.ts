@@ -46,6 +46,19 @@ export class MacWindow {
     });
   }
 
+  /** The window's whole content, for off-screen composition (pages, curtains, zoom). */
+  save(): Uint8Array {
+    return this.screen.save(this.g(this.bounds));
+  }
+
+  restore(data: Uint8Array, part: Rect = this.bounds) {
+    this.screen.restorePart(this.g(this.bounds), data, this.clip(part));
+  }
+
+  blitScaled(data: Uint8Array, dest: Rect) {
+    this.screen.blitScaled(this.g(this.bounds), data, this.g(dest));
+  }
+
   erase(r: Rect = this.bounds) {
     this.screen.fill(this.clip(r), 0);
   }

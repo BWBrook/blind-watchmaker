@@ -393,6 +393,14 @@ In Albuming `[UI:HandleClick]`, `[Alb:Emphasize]`:
 
 File > Load to Album... `[Alb:ReadAnimals]`, `[Alb:DoLoad]`, `[UI:DoFileMenuCommands]`: file chooser (BIOM and COLL files), watch pointer; biomorphs are appended; the last page is shown. File > Save Album... saves all non-cleared members. File > Close Album: if there are unsaved changes, alert "Save changes to Album before Closing?" (Save, Don't Save, Cancel); then page counters reset, window erased, mode Preliminary (blank screen). Breed continues from the last active biomorph.
 
+Corrections from a direct reading of `Album` and `User Interface` (2026-10-03), which supersede the bullets above where they differ:
+- Loading (DoLoad + StickInAlbum) curtains in the current page if the album is non-empty, then draws every new biomorph progressively into the next slot, erasing and titling a new page whenever one fills. The last biomorph ends up selected (TakeCare + InvertRect). Add Biomorph to Album is the same routine with one biomorph, followed by RestoreBreedingScreen (and DoEngineer again if engineering). Extra biomorphs beyond 4 pages are dropped with a beep. Events are flushed afterwards.
+- UnCurtainPage copies 8 px strips from the centre out while the left strip's left edge is > 0, then *erases* the last strip at each edge rather than copying it. No delay.
+- Show Album: one page = UnCurtainPage + TakeCare + invert the page's last biomorph. Several pages = Zoom.
+- Zoom quadrants: top pair from y = 15 to half the window height, bottom pair from half to the bottom (so the top pair is shorter). CopyBits srcCopy shrinks each page (thin lines can vanish). Zoom is modal until any click; the 3 px XOR frame stays on the last page pointed at. The click shows that page instantly (no curtain), then maps the point by exactly 2x and passes it to Emphasize, which applies GlobalToLocal to an already-local point (so the pick lands 20 px higher on the page).
+- Clear erases the slot and drops the highlight (OldSpecial := 0); the slot stays the selection, so Paste can fill it. Paste draws progressively, then inverts the slot.
+- Close Album with unsaved changes: the original closes even if the subsequent Save dialog is cancelled; this recreation keeps the album in that case.
+
 ### 6.8 Fossil record
 
 `[Bio:Evolve]`, `[UI:DoOperationMenuCommands]`, `[Alb:StartPlayBack]`, `[Alb:DoPlayBack]`, `[Alb:MyAction]`, `[Alb:ClosePlayBack]`, `[UI:DoSpecMenuCommands]`, `[R:STR# 11238]`, `[Man]`.
@@ -404,6 +412,14 @@ File > Load to Album... `[Alb:ReadAnimals]`, `[Alb:DoLoad]`, `[UI:DoFileMenuComm
   - Exit > Breed from Current Fossil (Cmd-B): closes the window, turns recording off, and starts breeding from the displayed fossil.
 - File > Save Fossils... saves the record as a collection file; File > Load as Fossils... replaces the record with a file (same file type as albums, so album files load as fossils and vice versa `[Man]`), turns recording off, and opens playback at the newest fossil. Help text notes the manual's description (breeding screen with progeny) is outdated: the Fossils window appears `[R:STR# 11238]`.
 - Source oddity (I): the enable logic uses the file read position, so after Play Back or after Load as Fossils the Play Back and Recording items can grey out and further recording can overwrite from the start. A recreation should instead enable Play Back and Recording whenever at least one fossil exists, and always append.
+
+Corrections from a direct reading of `Album` (StartPlayBack, MyAction, DoPlayBack, ClosePlayBack), `Biomorphs` (Evolve, Snapshot), `User Interface` and `Initialize` (2026-10-03), superseding the bullets above where they differ:
+- Recording is off at start-up (`Fossilizing := FALSE`). Initialize Fossil Record asks to save whenever fossils exist (not only when unsaved), then empties the record and turns recording on. Evolve appends the new parent after every litter, including the first litter of Breed, and also when a click misses every box.
+- The Fossils window's content is (52,90)-(460,290) at creation; the scroll bar sits in the right 16 px overlapping the frame, and the bottom 16 px hold an empty horizontal scroll-bar strip drawn by DrawGrowIcon. The picture area is the content less 17 px on the right and bottom, and each fossil is drawn whole with its root at that area's midpoint (no re-centring).
+- Snapshot clips to the main window's `businessPart` while the Fossils window is the port, so the top 20 px of the picture area are never drawn into.
+- Scroll value 0 is the newest fossil (thumb at the top). Arrows and page areas step one fossil per action call; thumb drags update the picture on release. In the original, the down arrow at the oldest fossil jumps to the newest (FossilCounter can reach NumberInFile); this recreation stops at the oldest.
+- Close box: the active biomorph reverts to the newest fossil. Exit > Close Window keeps the fossil last shown as the active biomorph. Exit > Breed from Current Fossil closes, turns recording off and breeds from the fossil on show.
+- Load as Fossils asks to save an existing record, empties it, turns recording off, reads up to 100 records from any Dawkins file and opens playback (from any mode).
 
 ### 6.9 Pedigree
 

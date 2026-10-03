@@ -3,7 +3,7 @@ import { SCREEN_H, SCREEN_W, type Screen } from './screen';
 /** A Macintosh tick, 1/60.15 s. */
 const TICK_MS = 1000 / 60.15;
 
-export type MacEvent = { type: 'mouseDown'; x: number; y: number } | { type: 'key'; key: string };
+export type MacEvent = { type: 'mouseDown'; x: number; y: number } | { type: 'key'; key: string; meta: boolean };
 
 /**
  * A Toolbox-style event source: discrete events are queued and fetched one at a time by the main loop,
@@ -16,6 +16,8 @@ export class Events {
   moved = false;
   touch = false;
   ticks = 0;
+  /** While a dialog is up, every keystroke is claimed from the browser. Unmodified keys are always queued (type-ahead). */
+  textInput = false;
   private queue: MacEvent[] = [];
   private cursor = '';
   private obscured = false;
@@ -58,12 +60,12 @@ export class Events {
     });
     canvas.addEventListener('contextmenu', (e) => e.preventDefault());
     window.addEventListener('keydown', (e) => {
-      if (e.altKey || e.repeat) return;
+      if (e.altKey) return;
       const meta = e.metaKey || e.ctrlKey;
-      if (this.keyFilter(e.key, meta)) {
-        e.preventDefault();
-        this.queue.push({ type: 'key', key: e.key.toUpperCase() });
-      }
+      if (document.activeElement instanceof HTMLInputElement && e.key !== 'Enter' && e.key !== 'Escape') return;
+      const wanted = (this.textInput && !meta) || (!e.repeat && this.keyFilter(e.key, meta));
+      if (wanted) e.preventDefault();
+      if (wanted || (!meta && !e.repeat)) this.queue.push({ type: 'key', key: e.key, meta });
     });
     const tick = () => {
       const now = Math.floor(performance.now() / TICK_MS);
@@ -88,6 +90,11 @@ export class Events {
   obscure() {
     this.obscured = true;
     this.screen.canvas.style.cursor = 'none';
+  }
+
+  /** FlushEvents: discard everything queued. */
+  flush() {
+    this.queue = [];
   }
 
   next(): MacEvent | undefined {

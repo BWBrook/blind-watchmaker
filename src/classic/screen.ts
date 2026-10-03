@@ -84,6 +84,23 @@ export class Screen {
     this.dirty = true;
   }
 
+  /** XORs a dotted grey outline, as DragWindow, GrowWindow and thumb dragging draw. */
+  xorOutline(r: Rect) {
+    const bm = this.bitmap;
+    const plot = (x: number, y: number) => {
+      if (x >= 0 && y >= 0 && x < bm.width && y < bm.height && !((x + y) & 1)) bm.bits[y * bm.width + x] ^= 1;
+    };
+    for (let x = r.left; x < r.right; x++) {
+      plot(x, r.top);
+      plot(x, r.bottom - 1);
+    }
+    for (let y = r.top + 1; y < r.bottom - 1; y++) {
+      plot(r.left, y);
+      plot(r.right - 1, y);
+    }
+    this.dirty = true;
+  }
+
   save(r: Rect): Uint8Array {
     const bm = this.bitmap;
     const w = r.right - r.left;
@@ -98,6 +115,34 @@ export class Screen {
     const bm = this.bitmap;
     const w = r.right - r.left;
     for (let y = r.top; y < r.bottom; y++) bm.bits.set(data.subarray((y - r.top) * w, (y - r.top + 1) * w), y * bm.width + r.left);
+    this.dirty = true;
+  }
+
+  /** Copies part of a buffer captured by save(from) back to the screen. */
+  restorePart(from: Rect, data: Uint8Array, part: Rect) {
+    const bm = this.bitmap;
+    const w = from.right - from.left;
+    const c = intersect(part, from);
+    for (let y = c.top; y < c.bottom; y++) {
+      const src = (y - from.top) * w + (c.left - from.left);
+      bm.bits.set(data.subarray(src, src + c.right - c.left), y * bm.width + c.left);
+    }
+    this.dirty = true;
+  }
+
+  /** CopyBits with scaling: shrinks a buffer captured by save(from) into dest by sampling, as srcCopy does. */
+  blitScaled(from: Rect, data: Uint8Array, dest: Rect) {
+    const bm = this.bitmap;
+    const sw = from.right - from.left;
+    const sh = from.bottom - from.top;
+    const dw = dest.right - dest.left;
+    const dh = dest.bottom - dest.top;
+    for (let y = 0; y < dh; y++) {
+      const sy = Math.floor((y * sh) / dh);
+      for (let x = 0; x < dw; x++) {
+        bm.bits[(dest.top + y) * bm.width + dest.left + x] = data[sy * sw + Math.floor((x * sw) / dw)];
+      }
+    }
     this.dirty = true;
   }
 

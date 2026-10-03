@@ -4,7 +4,8 @@ import { CHECK, COMMAND } from './glyphs';
 import { SCREEN_W, type Screen } from './screen';
 
 export interface MenuItem {
-  label: string;
+  /** A function for items whose text changes (e.g. Initialize/Reinitialize Fossil Record). */
+  label: string | (() => string);
   key?: string;
   enabled?: () => boolean;
   checked?: () => boolean;
@@ -28,8 +29,12 @@ interface Placed {
   title: Rect;
 }
 
+export const itemText = (i: MenuItem) => (typeof i.label === 'function' ? i.label() : i.label);
+
 export class MenuBar {
   private placed: Placed[] = [];
+  /** Bumped by setMenus, so a command that swaps the bar does not un-highlight a stale title. */
+  private generation = 0;
 
   constructor(
     private readonly screen: Screen,
@@ -41,6 +46,7 @@ export class MenuBar {
 
   setMenus(menus: Menu[]) {
     this.menus = menus;
+    this.generation++;
     this.layout();
     this.draw();
   }
@@ -116,7 +122,7 @@ export class MenuBar {
         return;
       }
       const e = this.events.next();
-      if (e?.type === 'key' && e.key === 'ESCAPE') {
+      if (e?.type === 'key' && e.key === 'Escape') {
         this.closeMenu(drop);
         return;
       }
@@ -144,10 +150,11 @@ export class MenuBar {
 
   private async runItem(p: Placed, item: MenuItem, alreadyHilited = false) {
     if (!alreadyHilited) this.screen.invert(p.title);
+    const generation = this.generation;
     try {
       await item.run?.();
     } finally {
-      this.screen.invert(p.title);
+      if (generation === this.generation) this.screen.invert(p.title);
     }
   }
 
@@ -160,7 +167,7 @@ export class MenuBar {
     s.invert(p.title);
     const items = p.menu.items;
     const hasKeys = items.some((i) => i?.key);
-    const textW = Math.max(...items.map((i) => (i ? s.textWidth(i.label) : 0)));
+    const textW = Math.max(...items.map((i) => (i ? s.textWidth(itemText(i)) : 0)));
     const width = textW + 14 + 10 + (hasKeys ? 34 : 0);
     const left = Math.min(p.title.left, SCREEN_W - width - 3);
     const rect = { left, top: BAR_H - 1, right: left + width, bottom: BAR_H + items.length * ITEM_H + 1 };
@@ -179,7 +186,7 @@ export class MenuBar {
         for (let x = row.left; x < row.right; x += 2) s.fill({ left: x, top: top + 8, right: x + 1, bottom: top + 9 }, 1);
         return;
       }
-      s.text(item.label, row.left + 13, top + 12);
+      s.text(itemText(item), row.left + 13, top + 12);
       if (item.checked?.()) s.glyph(CHECK, row.left + 2, top + 11);
       if (item.key) {
         const kx = row.right - 28;

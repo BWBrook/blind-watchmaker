@@ -2,7 +2,9 @@
 
 Browser recreations of Richard Dawkins' *Blind Watchmaker* biomorph program, for teaching cumulative selection.
 
-- **Classic** (`classic/`): the original monochrome Macintosh program, recreated pixel for pixel on a simulated 512 × 342 Mac screen. Breed, Highlight, Engineering, Hopeful Monster, Drift (cinematic and sweep), the Mutations menu, rows and columns, Help and About work. Album, Fossils, Pedigree and Triangle are still to come.
+- **Classic** (`classic/`): the original monochrome Macintosh program, recreated pixel for pixel on a simulated 512 × 342 Mac screen. Breed, Highlight, Engineering, Hopeful Monster, Drift (cinematic and sweep), the Mutations menu, rows and columns, the Album (pages, zoom, Clear, Copy, Paste), the Fossil record (recording, and playback in a draggable, resizable window with a scroll bar), loading and saving through System 6 Standard File dialogs, Help and About work. Pedigree and Triangle are still to come.
+
+The simulated disk ("Blind Watchmaker") holds Dawkins' own Alphabet zoo, Exhibition zoo and three single biomorphs; files a user saves are kept in their browser. The Drive button switches to the user's real computer (upload and download, in the original 40-byte format).
 
 ## Run
 

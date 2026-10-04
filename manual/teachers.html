@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Watchmaker Teacher Notes</title>
+    <meta
+      name="description"
+      content="Teacher notes for the Watchmaker's Manual: learning outcomes, session plans, expected observations and discussion answers for each investigation."
+    />
+    <link rel="stylesheet" href="../src/manual/manual.css" />
+  </head>
+  <body>
+    <main>
+      <header class="title">
+        <canvas data-bm="chess" data-scale="2" role="img" aria-label="A chess-piece biomorph"></canvas>
+        <h1>Teacher Notes</h1>
+        <p>For <a href="./">The Watchmaker's Manual</a> and the <a href="../classic/" target="_blank">Blind Watchmaker (Classic)</a></p>
+      </header>
+
+      <div class="note">
+        <p>
+          This page contains expected observations and suggested answers. Like the whole site it is public: it is linked
+          from the site's home page for teachers, but not from the student manual or the program.
+        </p>
+      </div>
+
+      <nav class="toc" aria-label="Contents">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#glance">At a glance</a></li>
+          <li><a href="#practical">Practicalities</a></li>
+          <li><a href="#plans">Suggested sessions</a></li>
+          <li><a href="#notabug">It's not a bug</a></li>
+          <li>
+            <a href="#notes">Investigation notes</a>
+            <ol>
+              <li><a href="#t-a">A</a> · <a href="#t-b">B</a> · <a href="#t-c">C</a> · <a href="#t-d">D</a> · <a href="#t-e">E</a> · <a href="#t-f">F</a> · <a href="#t-g">G</a> · <a href="#t-h">H</a> · <a href="#t-i">I</a></li>
+            </ol>
+          </li>
+          <li><a href="#big">The big questions</a></li>
+          <li><a href="#assess">Assessment ideas</a></li>
+        </ol>
+      </nav>
+
+      <h2 id="glance"><span class="num">1.</span> At a glance</h2>
+      <p>
+        The program is a faithful browser recreation of Richard Dawkins' Blind Watchmaker (version 1.1, 1993), the
+        biomorph program behind chapter 3 of <cite>The Blind Watchmaker</cite> (1986). Students select among randomly
+        mutated offspring and watch shapes evolve. The manual's investigations are modular: each stands alone and takes
+        10–25 minutes.
+      </p>
+      <h3>Learning outcomes the investigations support</h3>
+      <p>By working through a selection of them, students should be able to:</p>
+      <ol>
+        <li>Explain why cumulative selection can produce complex, apparently designed forms that single-step random variation cannot (A, G).</li>
+        <li>Distinguish change from adaptation, and selection from drift (B), including how the program's "Drift" differs from genetic drift in populations.</li>
+        <li>Describe the genotype–phenotype relationship as a developmental recipe, with pleiotropy and epistasis (C).</li>
+        <li>Explain how developmental innovations change what can evolve: constraint and evolvability (D, H).</li>
+        <li>Relate a complete record of descent to the incomplete real fossil record (E).</li>
+        <li>Explain divergence from common ancestors and why descent produces a nested hierarchy (F).</li>
+        <li>Evaluate the program as a model: artificial versus natural selection, and what it leaves out (I).</li>
+      </ol>
+
+      <h2 id="practical"><span class="num">2.</span> Practicalities</h2>
+      <ul>
+        <li><strong>Devices.</strong> A laptop or desktop with a mouse or trackpad works best. Tablets work. Phones work in landscape but are cramped.</li>
+        <li><strong>Browsers.</strong> Any current Chrome, Edge, Firefox or Safari. Nothing to install and no accounts.</li>
+        <li>
+          <strong>The manual</strong> opens in its own window from the link under the program's screen, so students can
+          keep both side by side. It also prints cleanly, one chapter per page.
+        </li>
+        <li>
+          <strong>Saving and handing in.</strong> Files saved to the program's disk live in that browser on that computer
+          only, and vanish if the browser's site data is cleared. For anything to be handed in, students should click
+          <b>Drive</b> in the Save dialog, which downloads the file. Edit ▸ Copy puts a picture of the current biomorph on
+          the clipboard for pasting into a report; ordinary screenshots also work.
+        </li>
+        <li><strong>Keyboard.</strong> Plain letters work as menu shortcuts (B for Breed and so on). Warn students that ⌘W and ⌘Q belong to the browser.</li>
+        <li><strong>Pairs.</strong> One driving, one recording, swapping between investigations, works well and keeps notes honest.</li>
+      </ul>
+
+      <h2 id="plans"><span class="num">3.</span> Suggested sessions</h2>
+      <table>
+        <thead>
+          <tr><th>Format</th><th>Suggested route</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>50-minute prac</td><td>Your first ten minutes → A (cumulative vs single-step) → C (genes to bodies). Close with question 1 of the big questions.</td></tr>
+          <tr><td>2-hour prac</td><td>First ten minutes → A → B → D → E or F. Ten-minute class discussion of I at the end.</td></tr>
+          <tr><td>50-minute tutorial</td><td>A short live demonstration of A, then I and the big questions as discussion. Students do A and C beforehand.</td></tr>
+          <tr><td>Phylogeny tie-in</td><td>F, then E: common descent, nested hierarchies and the fossil record.</td></tr>
+          <tr><td>Self-directed extension</td><td>D, G and H. Ask for a short illustrated write-up using Copy or screenshots.</td></tr>
+        </tbody>
+      </table>
+
+      <h2 id="notabug"><span class="num">4.</span> It's not a bug</h2>
+      <p>
+        The recreation copies the 1993 program's behaviour closely, including some surprises. Students may report these;
+        all are faithful to the original.
+      </p>
+      <ul>
+        <li>Many offspring look identical to their parent. The mutation rate gene (16) is 10 by default, and the program's actual chance is one less than the number shown (9%) per gene, so in many offspring no visible gene happens to mutate.</li>
+        <li>Big biomorphs are clipped by their box rather than shrunk.</li>
+        <li>Hopeful monsters are mostly small and scrappy.</li>
+        <li>Changing rows or columns leaves a single biomorph: choose Breed to continue. The first change from breeding keeps the parent's thick frame.</li>
+        <li>Drift stops whenever the pointer leaves the window.</li>
+        <li>The pointer disappears during animations and drift; moving the mouse brings it back.</li>
+        <li>The first stray click with Engineering's syringe only beeps; the second explains.</li>
+        <li>The Fossil record is off until Operation ▸ Initialize Fossil Record. Play Back works only from the breeding screen.</li>
+        <li>In the Fossils window, the top strip of the picture area never shows any biomorph.</li>
+        <li>The Triangle's corner biomorphs are near copies (about 99%) of the anchors, not exact ones.</li>
+        <li>Clearing an Album slot leaves a gap; gaps disappear when the Album is saved and reloaded.</li>
+        <li>After the last pedigree Adam is killed, Breed and most other commands grey out. Hopeful Monster or an Album pick provides a new biomorph.</li>
+        <li>Detaching a pedigree member can leave a white scratch across a third box that lay over the cut line.</li>
+      </ul>
+
+      <h2 id="notes"><span class="num">5.</span> Investigation notes</h2>
+
+      <section class="inv" id="t-a">
+        <h3>A. One step or many?</h3>
+        <p class="meta">Outcomes 1. Pairs. Works well with a class tally on the board.</p>
+        <h4>Expected observations</h4>
+        <p>
+          Of 50 hopeful monsters, most pairs will judge none, or one or two at a stretch, to be insect-like; most are small
+          tangles, often radially symmetric. By breeding from the tree, most pairs reach something convincingly
+          insect-like within a few dozen generations, typically through steady small improvements with occasional quick runs
+          when a useful mutation appears.
+        </p>
+        <h4>Suggested answers</h4>
+        <ol>
+          <li>The source of variation was identical: random mutation. The difference is <em>retention</em>: cumulative selection keeps each small improvement and builds on it, so the probability of the end result is the product of many likely small steps rather than one astronomically unlikely leap.</li>
+          <li>The weasel works the same way: keeping the best partial match each generation turns a 1-in-10<sup>40</sup> event into a few dozen rounds. Dawkins himself stressed the weasel's limitation: it has a distant, fixed target, whereas natural selection has no target, only immediate reproductive success. The biomorph breeding with a goal shares that limitation (see I).</li>
+          <li>Evolution combines random variation with non-random selection. Selection is the opposite of chance, so "evolution is just chance" describes only half the process.</li>
+        </ol>
+        <h4>Watch for</h4>
+        <ul>
+          <li>Students thinking mutations are directed towards what the breeder wants. They are not: the program mutates at random and the breeder only chooses.</li>
+          <li>Students assuming complex forms need large mutations.</li>
+        </ul>
+      </section>
+
+      <section class="inv" id="t-b">
+        <h3>B. Selection or drift?</h3>
+        <p class="meta">Outcome 2.</p>
+        <h4>Expected observations</h4>
+        <p>
+          Drift wanders with no consistent direction. Complexity rises and falls: forms may balloon into large, many-twigged
+          shapes or collapse into small ones. Resemblance to the starting tree is usually lost within a few dozen steps. A
+          two-minute burst of breeding for height produces sustained, directional change by comparison.
+        </p>
+        <h4>Suggested answers</h4>
+        <ol>
+          <li>Change is any heritable alteration; adaptation is change that improves fit to a particular function or environment, and it requires selection. Drift produced plenty of change but no adaptation.</li>
+          <li>
+            Genetic drift is random change in allele frequencies through sampling in a finite population (for example, which
+            individuals happen to reproduce). A model would need a population of many biomorphs carrying different variants,
+            parents drawn at random each generation, and a measure of variant frequencies over time, so that variants could be
+            lost or fixed by chance. The program's Drift is closer to neutral mutation accumulation in a single lineage: a
+            random walk through morphospace.
+          </li>
+        </ol>
+        <h4>Watch for</h4>
+        <ul><li>Equating drift with mutation. Make the distinction explicit, since the program's name invites the confusion.</li></ul>
+      </section>
+
+      <section class="inv" id="t-c">
+        <h3>C. From genes to bodies</h3>
+        <p class="meta">Outcome 3. A gene-effect table makes a good short write-up.</p>
+        <h4>Expected observations</h4>
+        <ul>
+          <li>Genes 1–3 change the sideways spread of different kinds of branch, everywhere in the tree at once.</li>
+          <li>Gene 4 changes the trunk and every vertical stem; gene 7 changes the downward-angled branches.</li>
+          <li>Gene 9 changes the number of forkings, and each step doubles the twigs.</li>
+          <li>Gene 10 stacks copies of the body (segments); gene 13 adds up-down or four-way symmetry.</li>
+          <li>With gene 9 at 1, only the trunk is drawn, so genes 1–3 have no visible effect at all.</li>
+          <li>A gradient on gene 4 makes each segment's stems longer (or shorter) than the last.</li>
+        </ul>
+        <h4>Suggested answers</h4>
+        <ol>
+          <li>Yes: every biomorph gene acts at every fork of its kind, so every gene is pleiotropic. This coordinates change (the whole body changes in step), but it also constrains it: a change that improves one part may spoil another. That favours mutations of small effect, a point made by R. A. Fisher.</li>
+          <li>Genes 1–3 are invisible when gene 9 is 1; gradients and segment distance do nothing in a one-segment biomorph; the scaling factor changes the effect of all the size genes.</li>
+          <li>Engineering requires knowing in advance which change produces which result. Nature has no engineer with foresight. Breeding needs only the ability to recognise a slightly better variant among those that turn up, which is exactly what differential survival and reproduction provide.</li>
+        </ol>
+      </section>
+
+      <section class="inv" id="t-d">
+        <h3>D. Evolving evolvability</h3>
+        <p class="meta">Outcome 4. The longest investigation; pairs comparing Albums is the payoff.</p>
+        <h4>Expected observations</h4>
+        <p>
+          In the nine-gene world students find trees, fans, insects, spiders and lattice-like shapes, all left–right
+          symmetric, single-bodied and unsegmented. Once the new mutations are switched on, segmented "centipedes" and
+          "plants", radially symmetric "stars", lopsided forms and tapering series appear, often within minutes.
+        </p>
+        <h4>Suggested answers</h4>
+        <ol>
+          <li>Segmentation changes the developmental rule rather than a particular shape: one mutation repeats an entire body plan, and gradients then let the repeats differ. It makes whole new regions of morphospace reachable in a few steps.</li>
+          <li>Candidate key innovations include segmentation in arthropods, annelids and vertebrates (somites); duplication of Hox genes; multicellularity; bilateral symmetry; jaws; and the tetrapod limb.</li>
+          <li>Dawkins (1989) suggested that lineages whose embryologies generate richer variation might come to dominate over long timescales: a kind of higher-level selection for evolvability. The idea is debated; it is a good one for students to argue about rather than accept.</li>
+        </ol>
+      </section>
+
+      <section class="inv" id="t-e">
+        <h3>E. Reading the fossil record</h3>
+        <p class="meta">Outcome 5. Remind students to Initialize the record before breeding.</p>
+        <h4>Expected observations</h4>
+        <p>
+          Change is gradual from fossil to fossil, with a visible turn where the goal changed, and occasional reversals.
+          Fossils ten generations apart can look quite different, and their relationship is not always obvious.
+        </p>
+        <h4>Suggested answers</h4>
+        <ol>
+          <li>Sampling every tenth fossil makes gradual change look like a series of jumps. The record alone cannot tell gradual change from rapid change between samples.</li>
+          <li>Wherever the samples are far apart. "Missing links" are an artefact of incomplete sampling of a continuous process. Note also that even this complete record follows one lineage: the side branches (the unchosen offspring) left no fossils at all.</li>
+        </ol>
+      </section>
+
+      <section class="inv" id="t-f">
+        <h3>F. Descent from a common ancestor</h3>
+        <p class="meta">Outcome 6. Pairs well with any phylogenetics teaching.</p>
+        <h4>Expected observations</h4>
+        <p>
+          Siblings differ only slightly, since they are one round of mutation from their parent. The tips of two long chains
+          differ much more, and more so the further apart they are in generations. Killing a child of the Adam removes that
+          child and every one of its descendants.
+        </p>
+        <h4>Suggested answers</h4>
+        <ol>
+          <li>Each lineage accumulates its own independent mutations, so differences grow with the number of generations since the common ancestor, even with no selection. This is the logic behind molecular clocks.</li>
+          <li>Branching descent with modification necessarily produces groups within groups: the traditional hierarchy of classification and the basis of phylogenetic trees. A world of species that did not fall into nested groups, for example traits scattered at random across groups, would be hard to explain by common descent.</li>
+          <li>The extinction of an early lineage: everything descended from it is lost with it, a whole clade.</li>
+        </ol>
+        <h4>Watch for</h4>
+        <ul><li>Detach is a bookkeeping tool for rearranging the display, not a biological event.</li></ul>
+      </section>
+
+      <section class="inv" id="t-g">
+        <h3>G. A walk through Biomorph Land</h3>
+        <p class="meta">Outcome 1. Short and visual; good as a demonstration.</p>
+        <h4>Expected observations</h4>
+        <p>
+          The pointer preview changes continuously, but intermediates are often not halfway in appearance: some features
+          switch suddenly (symmetry genes and the depth gene change in whole steps) and others interact. Outside the triangle,
+          features are exaggerated beyond any anchor, sometimes into large or bizarre forms.
+        </p>
+        <h4>Suggested answers</h4>
+        <ol>
+          <li>Every step changes one gene a little, yet in a space of many dimensions there are many directions to step in. Any distant point can be reached through a long series of small steps, and selection only ever has to choose among near neighbours.</li>
+          <li>Almost all points in the space are unremarkable, so a random landing (a hopeful monster) is almost never interesting. Stepwise selection follows a path of small improvements to the rare interesting regions.</li>
+        </ol>
+      </section>
+
+      <section class="inv" id="t-h">
+        <h3>H. The alphabet challenge</h3>
+        <p class="meta">Outcomes 1 and 4. Popular as a self-directed challenge.</p>
+        <h4>Expected observations</h4>
+        <p>
+          Mirror-symmetric letters (A, H, M, T, U, V, W, X, Y) can be approached; asymmetric ones need the Asymmetry gene and
+          careful work, and some are frustratingly hard. Students often hit dead ends and have to back off, breeding away from
+          the target for a while, before progress resumes.
+        </p>
+        <h4>Suggested answers</h4>
+        <ol>
+          <li>The branching rule produces mirror-symmetric shapes unless gene 12 says otherwise, so symmetric letters lie close to the starting point and asymmetric ones far away. In biology, the way development works makes some variants far more likely to arise than others: developmental constraint.</li>
+          <li>Natural selection has no distant target and no memory of a goal; it favours whatever reproduces best now. Breeding towards a chosen letter is goal-directed artificial selection.</li>
+        </ol>
+      </section>
+
+      <section class="inv" id="t-i">
+        <h3>I. Who is the watchmaker?</h3>
+        <p class="meta">Outcome 7. Best as a whole-class discussion.</p>
+        <h4>Suggested answers</h4>
+        <ol>
+          <li>Breeding biomorphs is artificial selection. Dawkins acknowledged this: the selecting is done by a human eye. Like Darwin with domestic pigeons, the program demonstrates the power of cumulative selection, and natural selection then supplies the selector.</li>
+          <li>In nature the "choice" is differential survival and reproduction in an environment: predators, competitors, climate, mates. A mechanical rule such as "the most twigs" corresponds to something like "plants that intercept the most light leave the most seeds". No one needs to see the outcome in advance.</li>
+          <li>The program leaves out populations of many individuals, sex and recombination, environments and ecology, competition and death, selection on reproductive success rather than appearance, changing conditions, and realistic timescales. It also has a human with foresight. Interestingly, Dawkins wrote an automatic target-seeking mode for the program, which v1.1 left switched off.</li>
+        </ol>
+      </section>
+
+      <h2 id="big"><span class="num">6.</span> The big questions</h2>
+      <ol>
+        <li><strong>What did the designing?</strong> Cumulative selection, here by the student, acting on random mutation, filtered through a developmental process that turns genes into shapes.</li>
+        <li><strong>Why small steps?</strong> A large random change to a working form almost always breaks it; a small one has a reasonable chance of being an improvement. Cumulative selection works because small improvements are usually available; large jumps are hopeful monsters.</li>
+        <li><strong>Is the mutation pattern realistic?</strong> Broadly. Real mutations range from no effect to large effect; most are neutral or slightly harmful, and large-effect mutations are rarer and usually harmful. The program's steps are equal in genetic size but unequal in effect, because development is nonlinear.</li>
+        <li><strong>What doesn't it show?</strong> Natural selection itself (there is no environment), population processes, sex, real developmental biology, and rates and timescales. It shows that cumulative selection on random variation is enough to produce designed-looking complexity.</li>
+        <li><strong>Would a replay give the same result?</strong> Almost certainly not: different mutations would turn up, so the path, and often the destination, would differ. This is a good way into Stephen Jay Gould's "replaying the tape of life" and the counter-argument from convergent evolution.</li>
+      </ol>
+
+      <h2 id="assess"><span class="num">7.</span> Assessment ideas</h2>
+      <ul>
+        <li><strong>Lab note (A or C):</strong> method, a table of results, two pictures (Copy or screenshots), and 200 words linking the observations to cumulative selection or pleiotropy.</li>
+        <li><strong>Fossil record exercise (E):</strong> submit the downloaded fossil file plus a short account of the lineage and what a sparse record would have suggested.</li>
+        <li><strong>Model critique (I):</strong> 400 words on how far biomorph breeding models natural selection, and what one change would make it a better model.</li>
+        <li><strong>Class data (A):</strong> pool generations-to-insect from every pair and plot the distribution; discuss the variation between pairs.</li>
+      </ul>
+
+      <footer>
+        <p><a href="./">The Watchmaker's Manual</a> · <a href="../">Blind Watchmaker home</a></p>
+        <p>
+          The recreation's behaviour is documented, routine by routine, in the specification on
+          <a href="https://github.com/BWBrook/blind-watchmaker" target="_blank">GitHub</a>, including every deliberate
+          difference from the 1993 original.
+        </p>
+      </footer>
+    </main>
+    <script type="module" src="../src/manual/figures.ts"></script>
+  </body>
+</html>

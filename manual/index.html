@@ -1,0 +1,724 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The Watchmaker's Manual</title>
+    <meta
+      name="description"
+      content="A student guide to the Blind Watchmaker (Classic): getting started, every feature, and investigations into how cumulative selection works."
+    />
+    <link rel="stylesheet" href="../src/manual/manual.css" />
+  </head>
+  <body>
+    <main>
+      <header class="title">
+        <canvas data-bm="insect" data-scale="2" role="img" aria-label="An insect-like biomorph"></canvas>
+        <h1>The Watchmaker's Manual</h1>
+        <p>A companion to the <a href="../classic/" target="_blank">Blind Watchmaker (Classic)</a></p>
+        <p>Keep this window open beside the program, and dip in whenever you are stuck.</p>
+      </header>
+
+      <nav class="toc" aria-label="Contents">
+        <strong>Contents</strong>
+        <ol>
+          <li>
+            <a href="#before">Before you start</a>
+            <ol>
+              <li><a href="#looking">What you are looking at</a></li>
+              <li><a href="#mac">Working a 1980s Macintosh</a></li>
+              <li><a href="#grow">How a biomorph grows</a></li>
+              <li><a href="#genes">The sixteen genes</a></li>
+            </ol>
+          </li>
+          <li><a href="#first">Your first ten minutes</a></li>
+          <li>
+            <a href="#reference">Feature reference</a>
+            <ol>
+              <li><a href="#ref-file">File</a> · <a href="#ref-edit">Edit</a> · <a href="#ref-operation">Operation</a> · <a href="#ref-view">View</a></li>
+              <li><a href="#ref-mutations">Mutations</a> · <a href="#ref-pedigree">Pedigree</a> · <a href="#ref-help">Help</a> · <a href="#ref-keys">Keyboard</a></li>
+            </ol>
+          </li>
+          <li>
+            <a href="#investigations">Investigations</a>
+            <ol>
+              <li><a href="#inv-a">A. One step or many?</a></li>
+              <li><a href="#inv-b">B. Selection or drift?</a></li>
+              <li><a href="#inv-c">C. From genes to bodies</a></li>
+              <li><a href="#inv-d">D. Evolving evolvability</a></li>
+              <li><a href="#inv-e">E. Reading the fossil record</a></li>
+              <li><a href="#inv-f">F. Descent from a common ancestor</a></li>
+              <li><a href="#inv-g">G. A walk through Biomorph Land</a></li>
+              <li><a href="#inv-h">H. The alphabet challenge</a></li>
+              <li><a href="#inv-i">I. Who is the watchmaker?</a></li>
+            </ol>
+          </li>
+          <li><a href="#further">Questions, glossary and further reading</a></li>
+        </ol>
+      </nav>
+
+      <!-- ===================================================================== -->
+      <h2 id="before"><span class="num">1.</span> Before you start</h2>
+
+      <h3 id="looking">What you are looking at</h3>
+      <p>
+        In the mid-1980s, while writing <cite>The Blind Watchmaker</cite> (1986), the biologist Richard Dawkins wrote a
+        program on his Apple Macintosh. He wanted to see whether the simplest possible model of evolution, random mutation plus
+        selection, repeated over many generations, could build something that looks designed. The result was this
+        program. The screen in front of you is a faithful recreation of it (version 1.1, 1993), right down to the
+        black-and-white pixels.
+      </p>
+      <p>
+        The little drawings are <strong>biomorphs</strong>, a word Dawkins took from the zoologist and surrealist
+        painter Desmond Morris, who used it for the animal-like shapes in his paintings. Each biomorph is grown from a short list of numbers,
+        its <strong>genes</strong>. You never draw a biomorph. You choose which ones get to have offspring, and the
+        offspring inherit their parent's genes with occasional small copying errors: <strong>mutations</strong>.
+        That is all. Everything you will see, from trees to insects to things that look like chandeliers, comes from
+        repeating those two steps.
+      </p>
+      <div class="bm-series" aria-label="Four of Dawkins' own biomorphs">
+        <figure><canvas data-bm="zoo:Exhibition zoo:4" data-box="101x100"></canvas></figure>
+        <figure><canvas data-bm="zoo:Exhibition zoo:21" data-box="101x100"></canvas></figure>
+        <figure><canvas data-bm="zoo:Exhibition zoo:38" data-box="101x100"></canvas></figure>
+        <figure><canvas data-bm="zoo:Exhibition zoo:46" data-box="101x100"></canvas></figure>
+      </div>
+      <p class="meta" style="text-align: center">Four of Dawkins' own biomorphs, from his "Exhibition zoo" file.</p>
+
+      <h3 id="mac">Working a 1980s Macintosh</h3>
+      <p>
+        The original ran on a Mac with a 9-inch black-and-white screen, and the recreation behaves the same way. A few
+        habits from 1986 are worth knowing.
+      </p>
+      <ul>
+        <li>
+          <strong>Menus.</strong> Press on a menu title (say <span class="menu">Operation</span>), slide down to an
+          item and let go. Or click the title once to open it and click the item. Items in grey are not available at
+          the moment.
+        </li>
+        <li>
+          <strong>Keyboard shortcuts.</strong> Most menu items show a ⌘ letter. You can type just the letter: press
+          <kbd>B</kbd> to Breed, <kbd>E</kbd> for Engineering, and so on. Avoid ⌘W and ⌘Q in the browser: they close
+          the tab or quit the browser. Use the File menu to quit.
+        </li>
+        <li>
+          <strong>The pointer tells you the mode.</strong> A cross means breeding; a die means Hopeful Monster; a
+          syringe means Engineering; a hand, scissors or gun mean you are rearranging a pedigree. During animations the
+          pointer disappears. Nudge the mouse and it comes back.
+        </li>
+        <li>
+          <strong>There is no Undo.</strong> If you like a biomorph, save it before you move on (Edit ▸ Add Biomorph to
+          Album, or just press <kbd>A</kbd>).
+        </li>
+      </ul>
+
+      <figure class="screen">
+        <img src="img/breeding.png" width="512" height="342" alt="The breeding screen: a strip of 16 numbered gene boxes across the top, and a grid of 15 boxes, each holding a tree-like biomorph; the centre box has a thick frame." />
+        <figcaption>
+          The breeding screen. The parent sits in the middle (thick frame), surrounded by fourteen offspring. The strip
+          along the top shows the genes of whichever biomorph is under the pointer.
+        </figcaption>
+      </figure>
+
+      <h3 id="grow">How a biomorph grows</h3>
+      <p>
+        A biomorph is not stored as a picture. It is grown, a little like an embryo, by following a simple rule over and
+        over. Start with a trunk. At its tip, sprout two branches, one leaning left and one leaning right. At the tip of
+        each of those, sprout two more, and so on. Gene 9 says how many times to repeat the forking, so each extra step
+        doubles the number of twigs.
+      </p>
+      <div class="bm-series" data-bm="basicTree" data-set="segNo=1;dgene=same;completeness=double" data-series="g9:2,3,4,5,6,7" data-label="gene 9 =" data-box="76x76"></div>
+      <p class="meta" style="text-align: center">The same tree with its forking repeated 2 to 7 times (gene 9). Everything else is identical.</p>
+      <p>
+        The other genes set the lengths and angles of the branches at each kind of fork. Because the same few numbers are
+        reused at every fork, one small change to a gene alters the whole drawing at once. That is the important idea:
+        <strong>genes are a recipe, not a blueprint</strong>. A blueprint would have one number per twig; a recipe
+        describes a process, and the shape emerges from it. Real genes work the same way, through development.
+      </p>
+
+      <h3 id="genes">The sixteen genes</h3>
+      <p>
+        The strip across the top of the screen has one box per gene. Point at any biomorph and the strip shows its genes.
+        Dawkins' first version, the one described in the book, had only the first nine. He added the rest a few years later
+        (see <a href="#inv-d">Investigation D</a>).
+      </p>
+      <table>
+        <thead>
+          <tr><th>Box</th><th>What it controls</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1 – 3</td><td>How far each kind of branch leans sideways. Bigger numbers mean wider spreads; negative numbers lean the other way.</td></tr>
+          <tr><td>4 – 8</td><td>How far each kind of branch reaches up or down. Gene 4 is the trunk; negative means upwards.</td></tr>
+          <tr><td>9</td><td>Depth: how many times the branches fork. Each step doubles the number of twigs.</td></tr>
+          <tr><td>10</td><td>Number of segments: copies of the whole body, stacked one below another.</td></tr>
+          <tr><td>11</td><td>Distance between segments.</td></tr>
+          <tr><td>12</td><td><b>Bilat</b> (mirror-symmetric, left and right alike) or <b>Asym</b> (only one side is drawn).</td></tr>
+          <tr><td>13</td><td><b>Single</b>, <b>UpDn</b> (also mirrored top to bottom) or <b>Radial</b> (four-way, like a starfish).</td></tr>
+          <tr><td>14</td><td>Scaling factor. Bigger numbers make a smaller biomorph.</td></tr>
+          <tr><td>15</td><td>Mutation size: how big a jump genes 1–8 make when they mutate.</td></tr>
+          <tr><td>16</td><td>Mutation rate: roughly the percentage chance that each gene mutates in each offspring.</td></tr>
+        </tbody>
+      </table>
+      <p>
+        A small black dot in a gene box marks a <strong>gradient</strong>: in a segmented biomorph, that gene grows (dot at
+        the top) or shrinks (dot at the bottom) from one segment to the next, so the segments are not all alike. On gene 9 a
+        dot means <em>tapering</em>: thick trunk, thin twigs. That is why the starting tree has a sturdy trunk.
+      </p>
+      <div class="bm-series" data-bm="insect" data-series="spokes:northOnly,nSouth,radial" data-label="gene 13:" data-box="90x90"></div>
+      <p class="meta" style="text-align: center">One insect with the three settings of gene 13: Single, UpDn and Radial.</p>
+
+      <!-- ===================================================================== -->
+      <h2 id="first"><span class="num">2.</span> Your first ten minutes</h2>
+      <p>
+        Open the program (or reload it). It starts by breeding a litter from Dawkins' starting tree. Then try this.
+      </p>
+      <ol class="steps">
+        <li>
+          <strong>Choose a goal.</strong> Pick something definite: the tallest, skinniest tree you can make; something
+          with wings; something that looks like a spider. Write it down. A goal turns you into a consistent selector.
+        </li>
+        <li>
+          <strong>Look at the litter.</strong> Most of the fourteen offspring look almost exactly like their parent.
+          Some are identical: no mutation happened to land on a gene that shows. A few differ in one small way.
+        </li>
+        <li>
+          <strong>Click the offspring closest to your goal.</strong> It glides to the centre and becomes the next parent.
+          A line flashes out to each box (an umbilical cord, Dawkins called it) and a new litter is drawn.
+        </li>
+        <li><strong>Repeat</strong> for twenty or thirty generations. Don't wait for a perfect child: take any step in the right direction.</li>
+        <li>
+          <strong>When you like the result,</strong> press <kbd>A</kbd> to add it to the Album, then carry on breeding.
+          Press <kbd>H</kbd> at any time for the program's own help on what you are doing.
+        </li>
+      </ol>
+      <div class="why">
+        <p class="label">What just happened</p>
+        <p>
+          You never made a big leap. Every step was a tiny variation on the one before, but the steps <em>added up</em>,
+          because each generation started from the best of the last. That is <strong>cumulative selection</strong>, the
+          engine of the whole book. Compare it with waiting for one lucky leap in <a href="#inv-a">Investigation A</a>.
+        </p>
+      </div>
+
+      <h3>If you get stuck</h3>
+      <dl class="glossary">
+        <dt>Nothing seems to change.</dt>
+        <dd>
+          Click the parent itself (the centre box) for a fresh litter. If change is still too slow, choose
+          <span class="menu">Engineering</span> and raise gene 15, the mutation size, by clicking the right-hand third of
+          its box; then choose <span class="menu">Breed</span> again.
+        </dd>
+        <dt>My biomorph is cut off at the edges.</dt>
+        <dd>
+          Biomorphs are never shrunk to fit; they are clipped by their box, as in 1986. Choose smaller offspring for a
+          while, or use View ▸ Fewer Columns for wider boxes. Rows and columns always stay odd, so that there is a middle
+          box for the parent.
+        </dd>
+        <dt>It has become enormous and slow to draw.</dt>
+        <dd>Pick offspring with fewer twigs, or lower gene 9 in Engineering.</dd>
+        <dt>I changed the grid and now there is only one biomorph.</dt>
+        <dd>That is normal. Choose <span class="menu">Breed</span> (<kbd>B</kbd>) to start a new litter in the new grid.</dd>
+        <dt>I lost a good one.</dt>
+        <dd>
+          There is no Undo. Save as you go: <kbd>A</kbd> adds the current biomorph to the Album, and File ▸ Save Biomorph
+          keeps it on the disk. Better still, turn on the Fossil record before you start (next tip).
+        </dd>
+        <dt>A menu item is grey.</dt>
+        <dd>It does not apply in the current mode. For example, Play Back Fossils only works from the breeding screen.</dd>
+      </dl>
+      <div class="tip">
+        <p class="label">Tip: keep a diary</p>
+        <p>
+          Choose Operation ▸ Initialize Fossil Record (<kbd>I</kbd>) before you start breeding. Every parent you choose
+          is then recorded, and Operation ▸ Play Back Fossils lets you scroll back through your lineage later.
+        </p>
+      </div>
+
+      <!-- ===================================================================== -->
+      <h2 id="reference"><span class="num">3.</span> Feature reference</h2>
+      <p>
+        One section per menu, in menu-bar order. The first menu, under the little biomorph at the far left, holds
+        <span class="menu">About Blind Watchmaker</span>. Click anywhere to close the About box.
+      </p>
+
+      <h3 id="ref-file">File</h3>
+      <figure class="screen">
+        <img src="img/open-dialog.png" width="512" height="342" alt="The Open dialog listing Dawkins' files: Alphabet zoo, Chinese character, Exhibition zoo, Handkerchief with bows, Stunted; buttons Eject, Drive, Open, Cancel." />
+        <figcaption>The 1980s Open dialog. The disk holds Dawkins' own files; <b>Drive</b> switches to files on your computer.</figcaption>
+      </figure>
+      <ul>
+        <li>
+          <span class="menu">Load to Album...</span> <kbd>L</kbd> opens a file of biomorphs and adds them to the Album. The disk
+          called "Blind Watchmaker" holds five of Dawkins' original files, including his <em>Alphabet zoo</em> and
+          <em>Exhibition zoo</em>. Click <b>Drive</b> to open a file from your own computer instead.
+        </li>
+        <li><span class="menu">Load as Fossils...</span> <kbd>O</kbd> opens a file as a fossil record and plays it back.</li>
+        <li>
+          <span class="menu">Save Biomorph...</span>, <span class="menu">Save Fossils...</span> <kbd>F</kbd> and
+          <span class="menu">Save Album...</span> <kbd>S</kbd> save to the disk. Files saved to the disk stay in this browser on this
+          computer. To keep a copy elsewhere, or hand one in, click <b>Drive</b> in the Save dialog to download it.
+        </li>
+        <li><span class="menu">Close Album</span> empties the Album (it offers to save first).</li>
+        <li><span class="menu">Quit</span> leaves the program.</li>
+      </ul>
+
+      <h3 id="ref-edit">Edit</h3>
+      <ul>
+        <li><span class="menu">Copy</span> <kbd>C</kbd> puts a picture of the current biomorph on the clipboard, ready to paste into a report.</li>
+        <li><span class="menu">Paste</span> <kbd>V</kbd> and <span class="menu">Clear</span> work on Album slots: Clear empties a slot, and Paste fills an empty slot with the last biomorph you copied.</li>
+        <li>
+          <span class="menu">Highlight Biomorph</span> lets you pick any biomorph on the breeding screen without breeding
+          from it: click one and its box turns black. It becomes the "active" biomorph that Engineering, Drift, Save and so on
+          will use.
+        </li>
+        <li><span class="menu">Add Biomorph to Album</span> <kbd>A</kbd> files the current biomorph on the next free Album page. The page flashes up, then you are returned to where you were.</li>
+        <li><span class="menu">Show Album</span> shows the Album. With more than one page you first see miniatures of all the pages: click one to open it, then click a biomorph to select it.</li>
+      </ul>
+      <figure class="screen">
+        <img src="img/album-zoom.png" width="512" height="342" alt="Four Album pages shown as miniatures: insects, more insects, segmented plant-like forms and radial star-like forms." />
+        <figcaption>Show Album with four pages: Dawkins' Exhibition zoo shown in miniature.</figcaption>
+      </figure>
+
+      <h3 id="ref-operation">Operation</h3>
+      <figure class="screen">
+        <img src="img/menu-operation.png" width="512" height="342" alt="The Operation menu open over the breeding screen, listing Breed, Drift, Engineering, Hopeful Monster, Initialize Fossil Record, Play Back Fossils, Recording Fossils, Triangle." />
+        <figcaption>The Operation menu: the main ways of working.</figcaption>
+      </figure>
+      <h4><span class="menu">Breed</span> <kbd>B</kbd></h4>
+      <p>
+        The heart of the program. The current biomorph becomes a parent in the centre box and its offspring fill the rest.
+        Click an offspring to make it the next parent; click the parent for a new litter. Point at any box to read its
+        genes in the strip.
+      </p>
+      <h4><span class="menu">Drift</span> <kbd>D</kbd></h4>
+      <p>
+        Mutation without selection. The biomorph changes by one random mutation after another, and nobody chooses. Drift only
+        runs while the pointer is inside the window: move up to the menu bar to pause, and choose another operation to stop.
+        View ▸ Drift Sweep shows the lineage spread across the boxes instead of one picture at a time.
+      </p>
+      <figure class="screen">
+        <img src="img/drift-sweep.png" width="512" height="342" alt="Drift Sweep: one lineage of tree-like biomorphs drawn box after box across the grid, thick forms changing into thin ones and back." />
+        <figcaption>Drift Sweep: one lineage, wandering without selection, written out box by box.</figcaption>
+      </figure>
+      <h4><span class="menu">Engineering</span> <kbd>E</kbd></h4>
+      <p>
+        Change genes directly, like a genetic engineer, instead of breeding. Move the pointer up into the gene strip
+        ("the chromosome"). Over the left third of a box it becomes a left arrowhead: click to lower that gene. The right
+        third raises it. Hold the button to repeat. In boxes 1–9 and 11, the middle third sets a gradient: upper part =
+        increasing, middle = none, lower = decreasing. Elsewhere the pointer is a hypodermic syringe that does nothing (try
+        it twice and the program will tell you so).
+      </p>
+      <figure class="screen">
+        <img src="img/engineering.png" width="512" height="342" alt="Engineering mode: the gene strip along the top and a single tree in the middle of an empty window." />
+        <figcaption>Engineering: one biomorph and its sixteen genes, ready for editing.</figcaption>
+      </figure>
+      <h4><span class="menu">Hopeful Monster</span> <kbd>M</kbd></h4>
+      <p>
+        A biomorph with entirely random genes, as if made by one enormous mutation. Click anywhere for another. (The name
+        comes from the geneticist Richard Goldschmidt, who thought new species might appear in single large jumps.)
+      </p>
+      <h4>Fossils: <span class="menu">Initialize Fossil Record</span> <kbd>I</kbd>, <span class="menu">Play Back Fossils</span>, <span class="menu">Recording Fossils</span> <kbd>R</kbd></h4>
+      <p>
+        Recording starts switched off. Initialize Fossil Record empties the record and starts recording: from then on, every
+        parent you choose while breeding is saved, oldest first. Recording Fossils switches recording off and on. Play Back
+        Fossils (from the breeding screen) opens a window with a scroll bar. The newest fossil is at the top; drag the
+        scroll box down, or click the arrows, to sink back through the strata. Drag the window by its title bar and resize
+        it from the bottom-right corner. In the Exit menu, <span class="menu">Breed from Current Fossil</span> starts breeding
+        again from the ancestor on show, and <span class="menu">Close Window</span> returns you to the breeding screen.
+      </p>
+      <figure class="screen">
+        <img src="img/fossils.png" width="512" height="342" alt="The Fossils window over the breeding screen, with a tree biomorph inside it and a scroll bar on the right; the menu bar shows only Exit and Help." />
+        <figcaption>Playing back the fossil record. The menu bar shrinks to Exit and Help while the window is open.</figcaption>
+      </figure>
+      <h4><span class="menu">Triangle</span> <kbd>T</kbd></h4>
+      <p>
+        Explore "Biomorph Land", the space of all possible biomorphs. Three anchor biomorphs sit at the corners of a
+        triangle. Every point inside is a blend of their genes, weighted by how close it is to each corner. As you move
+        the mouse, the pointer itself becomes a tiny picture of the biomorph you would get there. Click to draw it full size.
+        Points outside the triangle extrapolate beyond the anchors.
+      </p>
+      <figure class="screen">
+        <img src="img/triangle.png" width="512" height="342" alt="The Triangle: a tree at the top corner, an insect at the lower left, a chess-piece shape at the lower right, blends inside the triangle, and an extrapolated tree outside it." />
+        <figcaption>Biomorph Land: tree, insect and chess piece at the corners; blends inside; an extrapolation on the right.</figcaption>
+      </figure>
+
+      <h3 id="ref-view">View</h3>
+      <ul>
+        <li><span class="menu">More / Fewer Rows</span> and <span class="menu">More / Fewer Columns</span> change the breeding grid (always odd numbers; up to 99 boxes). Choose Breed afterwards to fill it.</li>
+        <li><span class="menu">Thicker Pen</span> and <span class="menu">Thinner Pen</span> (Engineering only) change the line width, for bolder pictures.</li>
+        <li><span class="menu">Drift Sweep</span> switches Drift between one picture at a time and a sweep across the boxes.</li>
+        <li><span class="menu">Make top / left / right of triangle</span> replaces a Triangle anchor with the current biomorph.</li>
+      </ul>
+
+      <h3 id="ref-mutations">Mutations</h3>
+      <p>
+        Each item switches one kind of mutation on (ticked) or off. A switched-off kind is frozen: those genes are inherited
+        unchanged. Genes 1 to 9 can always mutate.
+      </p>
+      <figure class="screen">
+        <img src="img/menu-mutations.png" width="512" height="342" alt="The Mutations menu: Segmentation, Gradient, Asymmetry, Radial Sym, Scaling Factor, Tapering twigs ticked; Mutation Size and Mutation Rate unticked." />
+        <figcaption>The Mutations menu at its starting settings.</figcaption>
+      </figure>
+      <table>
+        <tbody>
+          <tr><td>Segmentation</td><td>Gene 10 (number of segments) and gene 11 (distance between them). Switching it off also switches off Gradient.</td></tr>
+          <tr><td>Gradient</td><td>The segment-to-segment gradients (the dots).</td></tr>
+          <tr><td>Asymmetry</td><td>Gene 12, one-sided versus mirror-symmetric.</td></tr>
+          <tr><td>Radial Sym</td><td>Gene 13, up-down and four-way symmetry.</td></tr>
+          <tr><td>Scaling Factor</td><td>Gene 14.</td></tr>
+          <tr><td>Mutation Size</td><td>Gene 15 (off at the start).</td></tr>
+          <tr><td>Mutation Rate</td><td>Gene 16 (off at the start).</td></tr>
+          <tr><td>Tapering twigs</td><td>The gradient on gene 9: thick trunks and thin twigs.</td></tr>
+        </tbody>
+      </table>
+
+      <h3 id="ref-pedigree">Pedigree</h3>
+      <p>
+        A family tree you grow by hand. <span class="menu">Display pedigree</span> <kbd>1</kbd> puts the current biomorph in the
+        middle of the screen in a box with a double border. A double border marks an <em>Adam</em>: a biomorph with no
+        parent. Then:
+      </p>
+      <ul>
+        <li>
+          <span class="menu">Draw Out Offspring</span> <kbd>2</kbd>: press inside a box and drag outwards. A line follows the
+          pointer; let go and a mutant child is born where it ends, joined to its parent by a line. With
+          <span class="menu">Single Mirror</span> <kbd>4</kbd> or <span class="menu">Double Mirrors</span> <kbd>5</kbd> you draw
+          out two or four children at once (<span class="menu">No Mirrors</span> <kbd>3</kbd> returns to one).
+        </li>
+        <li><span class="menu">Move</span> <kbd>6</kbd>: drag boxes around. They stack like little windows, and the lines follow.</li>
+        <li><span class="menu">Detach</span> <kbd>7</kbd>: snip a biomorph (and its descendants) away from its parent. It becomes a new Adam.</li>
+        <li><span class="menu">Kill</span> <kbd>8</kbd>: remove a biomorph and all its descendants. There is no Undo.</li>
+      </ul>
+      <figure class="screen">
+        <img src="img/pedigree.png" width="512" height="342" alt="A pedigree: a tree biomorph in a double-bordered box in the middle, joined by lines to four offspring boxes around it." />
+        <figcaption>An Adam (double border) with four offspring drawn out at once using Double Mirrors.</figcaption>
+      </figure>
+
+      <h3 id="ref-help">Help</h3>
+      <p>
+        <span class="menu">Help with current operation</span> <kbd>H</kbd> shows the program's own short help for the
+        mode you are in. <span class="menu">Miscellaneous Help</span> covers the grid and the Mutations menu.
+      </p>
+
+      <h3 id="ref-keys">Keyboard summary</h3>
+      <table>
+        <tbody>
+          <tr><td><kbd>B</kbd> <kbd>D</kbd> <kbd>E</kbd> <kbd>M</kbd> <kbd>T</kbd></td><td>Breed, Drift, Engineering, Hopeful Monster, Triangle</td></tr>
+          <tr><td><kbd>I</kbd> <kbd>R</kbd></td><td>Initialize Fossil Record, Recording Fossils</td></tr>
+          <tr><td><kbd>A</kbd> <kbd>C</kbd> <kbd>V</kbd></td><td>Add to Album, Copy, Paste</td></tr>
+          <tr><td><kbd>L</kbd> <kbd>O</kbd> <kbd>S</kbd> <kbd>F</kbd></td><td>Load to Album, Load as Fossils, Save Album, Save Fossils</td></tr>
+          <tr><td><kbd>1</kbd> – <kbd>8</kbd></td><td>Pedigree: Display, Draw Out, No/Single/Double Mirrors, Move, Detach, Kill</td></tr>
+          <tr><td><kbd>H</kbd></td><td>Help with current operation</td></tr>
+          <tr><td><kbd>Return</kbd> / <kbd>Esc</kbd></td><td>The default button / Cancel in dialogs</td></tr>
+        </tbody>
+      </table>
+
+      <!-- ===================================================================== -->
+      <h2 id="investigations"><span class="num">4.</span> Investigations</h2>
+      <p>
+        Each investigation stands on its own and takes 10 to 25 minutes. They are ways of asking the program questions about
+        evolution. Work in pairs if you can: one at the mouse, one keeping notes, then swap. Each one ends with questions to
+        think about. There are no trick questions, but the best answers connect what you saw on the screen to what happens
+        in real populations.
+      </p>
+
+      <section class="inv" id="inv-a">
+        <h3>A. One step or many?</h3>
+        <p class="meta">About 20 minutes · Breed, Hopeful Monster</p>
+        <p>
+          <strong>The question.</strong> Could random variation alone, without accumulation, produce something that looks
+          designed? Dawkins called this <em>single-step selection</em>, as opposed to <em>cumulative selection</em>.
+        </p>
+        <ol class="steps">
+          <li>Agree on a target with your partner, for example "something that looks like an insect: a body, legs and maybe antennae".</li>
+          <li><strong>Single-step.</strong> Choose Operation ▸ Hopeful Monster (<kbd>M</kbd>). Click 50 times, counting how many monsters you would honestly call insects. Note the best one.</li>
+          <li><strong>Cumulative.</strong> Reload the program (or Breed from the starting tree). Breed towards your insect, counting generations, until you have something you would call an insect, or 50 generations have passed.</li>
+          <li>Press <kbd>A</kbd> to add your best insect to the Album, and compare it with the best monster.</li>
+        </ol>
+        <h4>What to notice</h4>
+        <ul>
+          <li>How often did a hopeful monster look like anything in particular?</li>
+          <li>How many generations did breeding take? Did progress come smoothly or in spurts?</li>
+        </ul>
+        <h4>Think about</h4>
+        <ol>
+          <li>Both methods used exactly the same kind of random variation. What made the difference?</li>
+          <li>
+            In the same chapter of his book, Dawkins imagines a monkey typing the phrase METHINKS IT IS LIKE A WEASEL. The
+            chance of typing all 28 characters correctly in one go is 1 in 27<sup>28</sup>, about 1 in 10<sup>40</sup>.
+            Keeping the closest attempt each round and copying it with errors gets there in a few dozen rounds. How is that
+            like what you just did with insects?
+          </li>
+          <li>Why is "evolution is just chance" a misunderstanding?</li>
+        </ol>
+      </section>
+
+      <section class="inv" id="inv-b">
+        <h3>B. Selection or drift?</h3>
+        <p class="meta">About 15 minutes · Drift, Drift Sweep, Breed</p>
+        <p><strong>The question.</strong> What happens to a lineage when mutations keep coming but nothing selects among them?</p>
+        <ol class="steps">
+          <li>Starting from the tree, choose Operation ▸ Drift (<kbd>D</kbd>) and keep the pointer in the window. Watch for two minutes. Pause by moving to the menu bar.</li>
+          <li>Choose View ▸ Drift Sweep and Drift again. Now the lineage is written out box by box. Watch a full sweep or two.</li>
+          <li>Choose Breed and spend two minutes selecting for one feature, such as height. Compare where the two lineages went.</li>
+        </ol>
+        <h4>What to notice</h4>
+        <ul>
+          <li>Does drifting have a direction? Does it get more complex, less complex, or neither?</li>
+          <li>How long does a drifting form keep any resemblance to where it started?</li>
+        </ul>
+        <h4>Think about</h4>
+        <ol>
+          <li>What is the difference between change and adaptation?</li>
+          <li>
+            In population genetics, "genetic drift" means random changes in gene frequencies because a population is finite.
+            The program's Drift is a little different: it follows a single lineage taking random mutational steps. What would
+            you need to add to make it a model of genetic drift in a population?
+          </li>
+        </ol>
+      </section>
+
+      <section class="inv" id="inv-c">
+        <h3>C. From genes to bodies</h3>
+        <p class="meta">About 20 minutes · Engineering</p>
+        <p><strong>The question.</strong> How do individual genes affect the body, and does the same change always have the same effect?</p>
+        <ol class="steps">
+          <li>Starting from the tree, choose Operation ▸ Engineering (<kbd>E</kbd>).</li>
+          <li>
+            Change one gene at a time, a few clicks up and then back down, and describe the effect in a table (gene, change,
+            what happened). Try genes 1, 4, 7, 9, 10 and 13.
+          </li>
+          <li>Now set gene 9 to 1 (left third of box 9, several clicks). Try changing genes 1, 2 and 3 again.</li>
+          <li>Set gene 9 back to 6 and add segments with gene 10 (right third). Then click the top of the middle third of box 4 to give it a gradient.</li>
+        </ol>
+        <div class="bm-series" data-bm="basicTree" data-set="segNo=1;dgene=same;completeness=double" data-series="g1:-40,-20,0,20,40" data-label="gene 1 =" data-box="90x90"></div>
+        <p class="meta" style="text-align: center">One gene, five values: a single number reshapes every fork at once.</p>
+        <h4>What to notice</h4>
+        <ul>
+          <li>Does any gene affect just one part of the body?</li>
+          <li>What happened to genes 1–3 when gene 9 was 1?</li>
+        </ul>
+        <h4>Think about</h4>
+        <ol>
+          <li>Biologists call a gene that affects many traits <em>pleiotropic</em>. Are biomorph genes pleiotropic? Why might that matter for evolution?</li>
+          <li>When the effect of one gene depends on another, that is <em>epistasis</em>. Where did you see it?</li>
+          <li>Engineering is quick, so why does nature not "engineer"? What does breeding do that engineering cannot?</li>
+        </ol>
+      </section>
+
+      <section class="inv" id="inv-d">
+        <h3>D. Evolving evolvability</h3>
+        <p class="meta">About 25 minutes · Mutations menu, Engineering, Breed</p>
+        <p>
+          <strong>The question.</strong> The book's original biomorphs had only nine genes. In 1987 Dawkins added
+          segmentation, gradients and new symmetries. Do new developmental tricks open up new kinds of body?
+        </p>
+        <ol class="steps">
+          <li>
+            Make a 1986 biomorph. In Engineering, click the left third of box 10 until it reads +1 (one segment), then click the
+            middle of boxes 4, 5, 6 and 9 to remove their dots. Set box 12 to Bilat (right third).
+          </li>
+          <li>In the Mutations menu, untick Segmentation, Asymmetry, Radial Sym, Scaling Factor and Tapering twigs. Now only genes 1–9 can mutate: the book's world.</li>
+          <li>Breed for ten minutes towards anything you like. Add three favourites to the Album.</li>
+          <li>Tick everything back on and breed for another ten minutes. Add three more favourites.</li>
+        </ol>
+        <div class="bm-series" data-bm="basicTree" data-set="dgene=same;segDist=110;completeness=double" data-series="segNo:1,2,3,4" data-label="segments:" data-box="90x100"></div>
+        <p class="meta" style="text-align: center">Segmentation: the same body plan repeated, one gene's worth of change.</p>
+        <h4>What to notice</h4>
+        <ul>
+          <li>Which kinds of shape appeared only after the new mutations were switched on?</li>
+          <li>Compare your Album favourites from the two sessions with a partner's.</li>
+        </ul>
+        <h4>Think about</h4>
+        <ol>
+          <li>Segmentation is a single change to <em>how</em> bodies are built, not to any particular body. Why might such a change be so powerful?</li>
+          <li>Real examples include the segmented bodies of arthropods and the repeated vertebrae of vertebrates. Which other developmental "inventions" might have opened up new possibilities in the history of life?</li>
+          <li>Can a lineage be selected for being good at evolving? (Dawkins explored this in his 1989 paper; see <a href="#reading">further reading</a>.)</li>
+        </ol>
+      </section>
+
+      <section class="inv" id="inv-e">
+        <h3>E. Reading the fossil record</h3>
+        <p class="meta">About 20 minutes · Fossil record, Breed</p>
+        <p><strong>The question.</strong> What does a complete record of a lineage look like, and how does it compare with real fossils?</p>
+        <ol class="steps">
+          <li>Choose Operation ▸ Initialize Fossil Record (<kbd>I</kbd>).</li>
+          <li>Breed for at least 30 generations towards a goal. Change your mind about the goal once, half way through.</li>
+          <li>Choose Operation ▸ Play Back Fossils. Scroll from the oldest (bottom) to the newest (top) with the arrows. Then jump around by dragging the scroll box.</li>
+          <li>File ▸ Save Fossils keeps the record. Use Drive to download it if you need to hand it in.</li>
+        </ol>
+        <h4>What to notice</h4>
+        <ul>
+          <li>Can you see where you changed your goal?</li>
+          <li>Pick two fossils ten generations apart. Would you guess they were related if you saw only those two?</li>
+        </ul>
+        <h4>Think about</h4>
+        <ol>
+          <li>Your record is complete; real fossil records are not. Pretend you only had every tenth fossil. What would the lineage seem to have done?</li>
+          <li>Where would a palaeontologist be tempted to talk about "sudden" change or "missing links"?</li>
+        </ol>
+      </section>
+
+      <section class="inv" id="inv-f">
+        <h3>F. Descent from a common ancestor</h3>
+        <p class="meta">About 20 minutes · Pedigree</p>
+        <p><strong>The question.</strong> How do related lineages diverge, and what do family trees of species look like?</p>
+        <ol class="steps">
+          <li>Choose Pedigree ▸ Display pedigree (<kbd>1</kbd>). Your current biomorph becomes an Adam.</li>
+          <li>Choose Pedigree ▸ Double Mirrors (<kbd>5</kbd>) and draw out four children at once from the Adam.</li>
+          <li>Switch back to No Mirrors (<kbd>3</kbd>). From two of the children, draw out a chain of five or six generations each, heading off in different directions.</li>
+          <li>Use Move (<kbd>6</kbd>) to tidy the layout. Then Kill (<kbd>8</kbd>) one child of the Adam and watch what disappears.</li>
+        </ol>
+        <h4>What to notice</h4>
+        <ul>
+          <li>How alike are siblings? How alike are the tips of your two long chains?</li>
+          <li>What did one Kill remove?</li>
+        </ul>
+        <h4>Think about</h4>
+        <ol>
+          <li>Why do two lineages from the same ancestor keep diverging, even without any selection pushing them apart?</li>
+          <li>Your pedigree is a nested hierarchy. Why do biologists expect real species to fall into groups within groups, and what would it mean if they did not?</li>
+          <li>What does a Kill near the root of the tree represent in the history of life?</li>
+        </ol>
+      </section>
+
+      <section class="inv" id="inv-g">
+        <h3>G. A walk through Biomorph Land</h3>
+        <p class="meta">About 15 minutes · Triangle</p>
+        <p>
+          <strong>The question.</strong> Every possible biomorph has a place in a vast space of genetic possibilities. What
+          is that space like?
+        </p>
+        <ol class="steps">
+          <li>Choose Operation ▸ Triangle (<kbd>T</kbd>). Move the pointer slowly from corner to corner and watch it change.</li>
+          <li>Click half a dozen points along one edge, then a few in the middle.</li>
+          <li>Click a few points well outside the triangle.</li>
+          <li>Breed something of your own, choose View ▸ Make right of triangle, then choose Triangle again and explore.</li>
+        </ol>
+        <h4>What to notice</h4>
+        <ul>
+          <li>Are the in-between forms always "halfway" in appearance?</li>
+          <li>What lies outside the triangle?</li>
+        </ul>
+        <h4>Think about</h4>
+        <ol>
+          <li>
+            The triangle is a flat slice through a space with as many dimensions as there are genes. With nine genes, each able to
+            step up or down, every biomorph in the book's version has eighteen nearest neighbours. Why does that make it
+            possible to travel a long way through the space in small steps?
+          </li>
+          <li>Hopeful Monster drops you at a random point in the space. Breeding walks you step by step. Why does one find interesting places and the other rarely does?</li>
+        </ol>
+      </section>
+
+      <section class="inv" id="inv-h">
+        <h3>H. The alphabet challenge</h3>
+        <p class="meta">About 25 minutes · Album, Breed</p>
+        <p><strong>The question.</strong> How easy is it to evolve a particular, chosen shape?</p>
+        <ol class="steps">
+          <li>File ▸ Load to Album (<kbd>L</kbd>) and open <em>Alphabet zoo</em>: Dawkins' own biomorph alphabet.</li>
+          <li>Pick a target letter, perhaps one of your initials. Click it on its Album page and press <kbd>E</kbd> (Engineering) to read its genes. Note them.</li>
+          <li>Reload the program to get back to Dawkins' starting tree, and breed towards your letter. Count generations, and add your closest attempt to the Album. (Reloading empties the Album; load the Alphabet zoo again whenever you need it.)</li>
+          <li>Try a letter that is not mirror-symmetric, such as J or L, and compare.</li>
+        </ol>
+        <h4>What to notice</h4>
+        <ul>
+          <li>Which letters are easy to approach, and which seem out of reach?</li>
+          <li>Did you get stuck at a dead end and have to retreat to go forward?</li>
+        </ul>
+        <h4>Think about</h4>
+        <ol>
+          <li>Why are symmetric letters (A, H, T, V, X) easier than asymmetric ones? What does that say about how the way bodies are built limits what can evolve?</li>
+          <li>Breeding towards a fixed target is unlike natural selection in one important way. Which?</li>
+        </ol>
+      </section>
+
+      <section class="inv" id="inv-i">
+        <h3>I. Who is the watchmaker?</h3>
+        <p class="meta">About 15 minutes, best as a discussion · any mode</p>
+        <p>
+          <strong>The question.</strong> The title of the book comes from William Paley's argument that a watch implies a
+          watchmaker. Dawkins' reply is that natural selection is a <em>blind</em> watchmaker: it has no foresight and no
+          plan. But in this program, who is choosing?
+        </p>
+        <ol class="steps">
+          <li>Breed for five minutes with no goal at all, choosing whatever catches your eye.</li>
+          <li>Then breed for five minutes with a strict rule, such as "always the one with the most twigs", and follow it mechanically.</li>
+        </ol>
+        <h4>Think about</h4>
+        <ol>
+          <li>In the program, you are the selective agent. Is breeding biomorphs closer to natural selection or to the artificial selection of pigeons and dogs that Darwin used as his starting point?</li>
+          <li>Your strict rule could have been carried out by a machine. What would a natural equivalent of the rule be: who or what "chooses" in nature?</li>
+          <li>What does the program leave out compared with real natural selection? Think about populations, environments, competition and death.</li>
+        </ol>
+      </section>
+
+      <!-- ===================================================================== -->
+      <h2 id="further"><span class="num">5.</span> Questions, glossary and further reading</h2>
+
+      <h3>Big questions to discuss</h3>
+      <ol>
+        <li>The biomorphs look designed, but nobody designed them. What, exactly, did the designing?</li>
+        <li>Why does evolution by cumulative selection need small steps? Could it work with large ones?</li>
+        <li>Most mutations made little visible difference, and a few made a big one. Is that realistic?</li>
+        <li>The program shows that cumulative selection is powerful. What does it <em>not</em> show about evolution in nature?</li>
+        <li>If you ran your breeding session again from the same tree with the same goal, would you end up with the same biomorph? What does that suggest about replaying the history of life?</li>
+      </ol>
+
+      <h3>Glossary</h3>
+      <dl class="glossary">
+        <dt>Adam</dt>
+        <dd>In a pedigree, a biomorph with no parent (shown with a double border).</dd>
+        <dt>Artificial selection</dt>
+        <dd>Breeding in which a person chooses which individuals reproduce, as with crops, pigeons and dogs.</dd>
+        <dt>Biomorph</dt>
+        <dd>One of the program's computer creatures, grown from a short list of genes.</dd>
+        <dt>Biomorph Land</dt>
+        <dd>Dawkins' name for the space of all possible biomorphs, in which every biomorph sits next to those it differs from by one mutation.</dd>
+        <dt>Cumulative selection</dt>
+        <dd>Selection repeated over many generations, each one starting from the results of the last, so that small improvements add up.</dd>
+        <dt>Development (embryology)</dt>
+        <dd>The process by which genes build a body. In the program, the recursive branching rule.</dd>
+        <dt>Drift (in this program)</dt>
+        <dd>A lineage changing by random mutation with no selection. Not quite the same as genetic drift in a population.</dd>
+        <dt>Epistasis</dt>
+        <dd>When the effect of one gene depends on the state of others.</dd>
+        <dt>Evolvability</dt>
+        <dd>The capacity of a lineage to produce useful variation. Developmental innovations such as segmentation can increase it.</dd>
+        <dt>Genotype and phenotype</dt>
+        <dd>The genes (the numbers in the strip) and the body they build (the drawing).</dd>
+        <dt>Gradient</dt>
+        <dd>A gene whose value changes from one segment to the next.</dd>
+        <dt>Hopeful monster</dt>
+        <dd>A form produced by a single large mutation. The phrase is Richard Goldschmidt's.</dd>
+        <dt>Mutation</dt>
+        <dd>A random change in a gene when it is copied into an offspring.</dd>
+        <dt>Pleiotropy</dt>
+        <dd>When one gene affects several traits.</dd>
+        <dt>Segmentation</dt>
+        <dd>A body built from repeated units. Gene 10 in the program.</dd>
+        <dt>Single-step selection</dt>
+        <dd>Hoping that random variation produces a finished result in one go.</dd>
+      </dl>
+
+      <h3 id="reading">Further reading</h3>
+      <ul>
+        <li>Dawkins, R. (1986). <cite>The Blind Watchmaker</cite>. Longman / Norton. Chapter 3, "Accumulating small change", introduces the biomorphs and the weasel.</li>
+        <li>Dawkins, R. (1989). The evolution of evolvability. In C. G. Langton (ed.), <cite>Artificial Life</cite>. Addison-Wesley. Where segmentation and the other new genes were introduced.</li>
+        <li>Dawkins, R. (1996). <cite>Climbing Mount Improbable</cite>. Viking / Norton. More computer creatures, and the idea of climbing the gentle slopes of an evolutionary landscape.</li>
+        <li>Darwin, C. (1859). <cite>On the Origin of Species</cite>. Chapter 1, "Variation under domestication", the artificial-selection argument behind the whole program.</li>
+      </ul>
+
+      <footer>
+        <p>
+          <a href="../">Blind Watchmaker home</a> · <a href="../classic/" target="_blank">Open the program</a>
+        </p>
+        <p>
+          An independent educational recreation of Richard Dawkins' Blind Watchmaker, not affiliated with him or his
+          publishers. Biomorph pictures in this guide are drawn by the recreation's own engine; the biomorphs from the
+          Exhibition zoo are Dawkins' own.
+        </p>
+      </footer>
+    </main>
+    <script type="module" src="../src/manual/figures.ts"></script>
+  </body>
+</html>

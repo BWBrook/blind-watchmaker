@@ -4,6 +4,8 @@ Browser recreations of Richard Dawkins' *Blind Watchmaker* biomorph program, for
 
 - **Classic** (`classic/`): the original monochrome Macintosh program, recreated pixel for pixel on a simulated 512 × 342 Mac screen. Breed, Highlight, Engineering, Hopeful Monster, Drift (cinematic and sweep), the Mutations menu, rows and columns, the Album (pages, zoom, Clear, Copy, Paste), the Fossil record (recording, and playback in a draggable, resizable window with a scroll bar), the Pedigree (draw out offspring with 0, 1 or 2 mirrors, Move, Detach, Kill), the Triangle ("Biomorph Land", with its live miniature pointer), loading and saving through System 6 Standard File dialogs, Help and About all work.
 
+- **The Watchmaker's Manual** (`manual/`): a student guide that pops out beside the program: getting started, a reference for every menu, nine modular investigations (cumulative selection, drift, genotype to phenotype, evolvability, fossils, common descent, Biomorph Land, the alphabet challenge, artificial versus natural selection) and a glossary. Teacher notes with expected observations and discussion answers are in `manual/teachers.html`. Biomorph figures are drawn by the recreation's own engine; screen pictures are captures of the program.
+
 The simulated disk ("Blind Watchmaker") holds Dawkins' own Alphabet zoo, Exhibition zoo and three single biomorphs; files a user saves are kept in their browser. The Drive button switches to the user's real computer (upload and download, in the original 40-byte format).
 
 ## Run
@@ -19,6 +21,7 @@ npm run build    # static site in dist/
 
 - `src/engine/`: genome, development (Dawkins' recursive tree), mutation, Engineering edits, Triangle blending, the original 40-byte file format, and Dawkins' saved biomorphs (`zoos.json`). No DOM.
 - `src/classic/`: the 1-bit Mac screen, Toolbox-style event loop, menu bar, dialogs and the program's modes.
+- `src/manual/`: the manual's stylesheet and engine-drawn figures.
 - `docs/spec/`: the engine and interface specifications the recreation is built from.
 
 ## Provenance

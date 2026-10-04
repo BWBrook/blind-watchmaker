@@ -18,6 +18,16 @@ function fit() {
   canvas.style.height = `${SCREEN_H * scale}px`;
   app?.setScale(scale);
 }
+/** The manual opens as a pop-out window beside the program on wide screens, and as a tab elsewhere. */
+document.querySelector<HTMLAnchorElement>('#manual-link')?.addEventListener('click', (e) => {
+  const width = 620;
+  if (window.screen.availWidth < 1100) return;
+  e.preventDefault();
+  const height = Math.min(window.screen.availHeight - 60, 960);
+  const left = Math.max(0, Math.min(window.screen.availWidth - width, screenX + outerWidth));
+  window.open((e.currentTarget as HTMLAnchorElement).href, 'watchmaker-manual', `popup,width=${width},height=${height},left=${left},top=40`)?.focus();
+});
+
 addEventListener('resize', fit);
 fit();
 app.run();

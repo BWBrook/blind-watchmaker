@@ -8,6 +8,8 @@ export default defineConfig({
       input: {
         main: resolve(import.meta.dirname, 'index.html'),
         classic: resolve(import.meta.dirname, 'classic/index.html'),
+        manual: resolve(import.meta.dirname, 'manual/index.html'),
+        teachers: resolve(import.meta.dirname, 'manual/teachers.html'),
       },
     },
   },

@@ -240,7 +240,7 @@ export class Pedigree {
       this.localLines(f, 'xor');
     };
     show();
-    ev.obscure();
+    ev.hide();
     let last = start;
     while (ev.down) {
       await ev.tick();
@@ -255,6 +255,7 @@ export class Pedigree {
       show();
       last = p;
     }
+    ev.show();
     this.redrawAll();
   }
 

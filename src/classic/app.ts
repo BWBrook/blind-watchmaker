@@ -56,6 +56,10 @@ const SCROLL_REPEAT_TICKS = 3;
 /** Album Zoom: four page miniatures below a 15 px strip. */
 const ZOOM_TOP = 15;
 
+/** The save-changes alert's buttons, laid out right to left: Save (default), Cancel, then Don't Save on the left. */
+const SAVE_CHANGES = ['Save', 'Cancel', "Don't Save"];
+const [SAVE, CANCEL, DONT_SAVE] = [0, 1, 2];
+
 const inRect = (r: Rect, x: number, y: number) => x >= r.left && x < r.right && y >= r.top && y < r.bottom;
 
 const glide = (a: number, b: number) => (Math.abs(b - a) <= 20 ? b : a + Math.trunc((b - a) / 2));
@@ -81,9 +85,18 @@ export class App implements DialogHost {
   private albumSel = -1;
   private albumHi = false;
   private copied: Genome | undefined;
+  /** ClipBoarding: after Copy, both Help items show the Copy help until an Edit, Operation, View or Mutations
+   * command, or any drawing of a biomorph. */
   private lastWasCopy = false;
   private readonly disk = new Disk();
-  private readonly fileNames = { album: 'Album', biomorph: 'Biomorph', fossils: 'Fossils' };
+  /** SFPutFile's default: the last name typed in any Save dialog (LastPutFileName), initially empty. */
+  private lastPutName = '';
+  /** Highlighting: whether the active box is currently shown inverted (OldSpecial > 0). */
+  private hlShown = false;
+  /** Drift Sweep: the first step after entry or a toggle frames 1 px, later ones 3 px (the pen stays 3 px wide). */
+  private sweepFirst = true;
+  /** The hypodermic alert's stage: the first stray click only beeps. */
+  private hypodermicStage = 0;
   private readonly fossils = new FossilRecord();
   private readonly fossilWindow: FossilWindow;
   private playback: { saveMode: Mode; first: Genome; shown: Genome; counter: number; under: Uint8Array } = {
@@ -180,6 +193,7 @@ export class App implements DialogHost {
   // Drawing.
 
   private linesFor(g: Genome, at: { h: number; v: number }, recentre: boolean, engineering = false) {
+    this.lastWasCopy = false;
     const pic = develop(g, { penSize: this.penSize, engineering });
     const place = recentre ? { h: at.h, v: at.v - centringOffset(pic) } : at;
     return { genome: pic.genome, lines: placedLines(pic, place), pic };
@@ -235,9 +249,10 @@ export class App implements DialogHost {
     } else if (this.mode === 'highlighting') {
       const k = this.grid.boxAt(p.x, p.y);
       if (k >= 0 && this.children[k]) {
-        this.win.invert(this.grid.box(this.special));
+        if (this.hlShown) this.win.invert(this.grid.box(this.special));
         this.special = k;
         this.win.invert(this.grid.box(k));
+        this.hlShown = true;
       }
     } else if (this.mode === 'engineering') await this.engineerClick(p.x, p.y);
     else if (this.mode === 'randoming') await this.newMonster();
@@ -296,6 +311,7 @@ export class App implements DialogHost {
       else if (this.mode === 'moving') name = 'hand';
       else if (this.mode === 'detaching') name = 'scissors';
       else if (this.mode === 'killing') name = 'gun';
+      else if (this.mode === 'preliminary') name = 'plus';
       else if (this.mode === 'engineering') {
         const z = geneZone(this.win, p.x, p.y);
         const graded = z && (z.box <= 9 || z.box === 11);
@@ -339,23 +355,28 @@ export class App implements DialogHost {
     const grid = this.grid;
     const mid = grid.mid;
     const biz = grid.business();
-    const { genome: parent, pic } = this.linesFor(this.children[j], grid.centre(j), true);
-    const off = centringOffset(pic);
+    const parent = develop(this.children[j], { penSize: this.penSize }).genome;
     const target = grid.centre(mid);
-    let at = grid.centre(j);
     ev.obscure();
-    const show = (clip: Rect) => {
+    // Slide moves the chosen box's pixels (its frame wiped, the picture as clipped to the box) to the centre.
+    const from = grid.box(j);
+    this.win.frame(from, 1, 'white');
+    const pixels = this.win.grab(from);
+    const w = from.right - from.left;
+    const h = from.bottom - from.top;
+    let at = { h: from.left, v: from.top };
+    const goal = { h: grid.box(mid).left, v: grid.box(mid).top };
+    const show = () => {
       this.win.erase(biz);
-      this.drawNow(placedLines(pic, { h: at.h, v: at.v - off }), clip);
+      this.win.put({ left: at.h, top: at.v, right: at.h + w, bottom: at.v + h }, pixels);
     };
-    show(grid.box(j));
-    while (at.h !== target.h || at.v !== target.v) {
+    show();
+    while (at.h !== goal.h || at.v !== goal.v) {
       await ev.tick();
-      at = { h: glide(at.h, target.h), v: glide(at.v, target.v) };
-      show(biz);
+      at = { h: glide(at.h, goal.h), v: glide(at.v, goal.v) };
+      show();
     }
     this.setActive(parent);
-    show(grid.box(mid));
     this.frameBoxes();
     for (let k = 0; k < grid.n; k++) {
       if (k === mid) continue;
@@ -376,6 +397,7 @@ export class App implements DialogHost {
     if (this.mode === 'highlighting') return;
     this.mode = 'highlighting';
     this.win.invert(this.grid.box(this.special));
+    this.hlShown = true;
     drawStrip(this.win, this.active());
   }
 
@@ -385,8 +407,20 @@ export class App implements DialogHost {
     this.win.erase();
     const { genome, lines } = this.linesFor(g, this.grid.centre(this.grid.mid), true, true);
     this.setActive(genome);
-    drawStrip(this.win, genome);
+    this.hypodermicStage = 0;
     await this.drawSlowly(lines, this.grid.business());
+    drawStrip(this.win, genome);
+  }
+
+  /** SyringeMessage: ALRT 30130's first stage only beeps; later stray clicks show the alert. */
+  private async hypodermic() {
+    beep();
+    if (++this.hypodermicStage < 2) return;
+    await alert(
+      this,
+      'The hypodermic is only for show. Move it up into the chromosome (the gene strip) and it will change into a pointer you can use. If in doubt, choose Help with current operation.',
+      ['Okay'],
+    );
   }
 
   private redrawEngineered() {
@@ -401,11 +435,7 @@ export class App implements DialogHost {
     const ev = this.events;
     let hit = geneZone(this.win, x, y);
     if (!hit) {
-      await alert(
-        this,
-        'The hypodermic is only for show. Move it up into the chromosome (the gene strip) and it will change into a pointer you can use. If in doubt, choose Help with current operation.',
-        ['Okay'],
-      );
+      await this.hypodermic();
       return;
     }
     let delay = ENGINEERING_REPEAT_DELAY;
@@ -419,8 +449,10 @@ export class App implements DialogHost {
       do await ev.tick();
       while (ev.down && ev.ticks < until);
       if (!ev.down) return;
+      // The repeat is a posted mouse-down at the pointer, so dragging off the chromosome meets the hypodermic.
       const p = this.win.local(ev.x, ev.y);
       hit = p && geneZone(this.win, p.x, p.y);
+      if (!hit && p) await this.hypodermic();
     }
   }
 
@@ -430,8 +462,7 @@ export class App implements DialogHost {
   }
 
   private async newMonster() {
-    this.events.obscure();
-    const g = hopefulMonster(this.active(), this.flags);
+    const g = hopefulMonster(this.children[this.grid.mid] ?? this.active(), this.flags);
     this.win.erase();
     const { genome, lines } = this.linesFor(g, this.grid.centre(this.grid.mid), false);
     this.setActive(genome);
@@ -442,44 +473,54 @@ export class App implements DialogHost {
   private doDrift() {
     this.mode = 'drifting';
     this.sweepSlot = 0;
+    this.sweepFirst = true;
     this.lastDrift = 0;
     this.win.erase();
   }
 
   private async driftStep() {
     const g = this.active();
+    this.events.obscure();
     if (!this.sweep) {
+      // Snapshot clips to businessPart: the strip area is never touched.
+      const biz = this.grid.business();
       const { genome, lines } = this.linesFor(g, { h: this.win.width >> 1, v: this.win.height >> 1 }, false);
-      this.win.erase();
-      this.drawNow(lines, this.win.bounds);
+      this.win.erase(biz);
+      this.drawNow(lines, biz);
       this.children[this.special] = reproduce(genome, this.flags);
       return;
     }
     const n = this.grid.n;
     const k = this.sweepSlot;
-    this.win.frame(this.grid.box((k + n - 1) % n), 3, 'white');
+    if (!this.sweepFirst) this.win.frame(this.grid.box((k + n - 1) % n), 3, 'white');
     this.win.erase(this.grid.box(k));
-    this.win.frame(this.grid.box(k));
+    this.win.frame(this.grid.box(k), this.sweepFirst ? 1 : 3);
+    this.sweepFirst = false;
     const { genome, lines } = this.linesFor(g, this.grid.centre(k), true);
     await this.drawSlowly(lines, this.grid.box(k));
     this.children[this.special] = reproduce(genome, this.flags);
     this.sweepSlot = (k + 1) % n;
   }
 
+  /** DoRowMore etc.: an over-limit step is refused, but the window is still redrawn as boxes only. */
   private async changeGrid(dr: number, dc: number) {
     const g = this.active();
-    this.grid = new Grid(this.grid.rows + dr, this.grid.cols + dc, this.win.width, this.win.height);
-    this.mode = 'preliminary';
+    const rows = this.grid.rows + dr;
+    const cols = this.grid.cols + dc;
+    if (rows * cols <= MAX_BOXES) this.grid = new Grid(rows, cols, this.win.width, this.win.height);
     this.win.erase();
     this.frameBoxes();
+    for (let k = 0; k < this.grid.n; k++) this.win.frame(this.grid.box(k));
+    this.mode = 'preliminary';
+    if (this.bereft) return;
     const { genome, lines } = this.linesFor(g, this.grid.centre(this.grid.mid), true);
     this.setActive(genome);
     await this.drawSlowly(lines, this.grid.box(this.grid.mid));
   }
 
-  private changePen(d: number) {
+  private async changePen(d: number) {
     this.penSize += d;
-    this.redrawEngineered();
+    await this.doEngineer();
   }
 
   // The album (Album unit).
@@ -536,9 +577,9 @@ export class App implements DialogHost {
   }
 
   /** DoLoad + StickInAlbum: curtain in the current page, then draw each newcomer into the next slot. */
-  private async albumLoad(genomes: Genome[]): Promise<number> {
+  private async albumLoad(genomes: Genome[], curtain = true): Promise<number> {
     const first = this.album.slots.length;
-    if (!this.album.isEmpty) await this.curtain(this.album.pages - 1);
+    if (curtain && !this.album.isEmpty) await this.curtain(this.album.pages - 1);
     this.mode = 'albuming';
     const fitted = this.album.append(genomes);
     for (let slot = first; slot < first + fitted; slot++) {
@@ -634,13 +675,20 @@ export class App implements DialogHost {
     }
     const before = this.win.save();
     const mode = this.mode;
-    const g = this.active();
-    await this.albumLoad([g]);
+    const children = [...this.children];
+    const special = this.special;
+    await this.albumLoad([this.active()]);
     this.album.dirty = true;
-    this.setActive(g);
+    // RestoreBreedingScreen: the old screen and children come back, with the centre box as Special.
     this.win.restore(before);
     this.albumHi = false;
+    this.children = children;
     this.mode = mode;
+    if (mode === 'highlighting' && this.hlShown) {
+      this.win.invert(this.grid.box(special));
+      this.hlShown = false;
+    }
+    this.special = this.grid.mid;
     if (mode === 'engineering') await this.doEngineer();
   }
 
@@ -694,7 +742,12 @@ export class App implements DialogHost {
     }
   }
 
+  /** DoLoad(TRUE): with an album already there, its current page curtains in (album mode) before the dialog. */
   private async loadToAlbum() {
+    if (!this.album.isEmpty) {
+      await this.curtain(this.album.pages - 1);
+      this.takeCare(this.album.pages - 1);
+    }
     const file = await getFile(this, this.disk);
     if (!file) return;
     const valid = file.genomes.filter((g) => g.gene[8] >= 1).map(normalise);
@@ -703,28 +756,28 @@ export class App implements DialogHost {
       return;
     }
     if (!this.album.isEmpty) this.album.dirty = true;
-    await this.albumLoad(valid);
+    await this.albumLoad(valid, false);
     this.events.flush();
   }
 
   private async saveAlbum(): Promise<boolean> {
-    const name = await putFile(this, this.disk, 'Save Album', this.fileNames.album, 'COLL', this.album.members());
+    const name = await putFile(this, this.disk, 'Save Album', this.lastPutName, 'COLL', this.album.members());
     if (!name) return false;
-    this.fileNames.album = name;
+    this.lastPutName = name;
     this.album.dirty = false;
     return true;
   }
 
   private async saveBiomorph() {
-    const name = await putFile(this, this.disk, 'Save Biomorph', this.fileNames.biomorph, 'BIOM', [this.active()]);
-    if (name) this.fileNames.biomorph = name;
+    const name = await putFile(this, this.disk, 'Save Biomorph', this.lastPutName, 'BIOM', [this.active()]);
+    if (name) this.lastPutName = name;
   }
 
   /** Offers to save unsaved album changes; false if the user cancelled. */
   private async albumSaved(): Promise<boolean> {
     if (!this.album.dirty) return true;
-    const k = await alert(this, 'Save changes to Album before Closing?', ['Save', "Don't Save", 'Cancel'], 'caution');
-    return k === 1 || (k === 0 && (await this.saveAlbum()));
+    const k = await alert(this, 'Save changes to Album before Closing?', SAVE_CHANGES, 'caution');
+    return k === DONT_SAVE || (k === SAVE && (await this.saveAlbum()));
   }
 
   private async closeAlbum() {
@@ -740,8 +793,8 @@ export class App implements DialogHost {
   private async quit() {
     if (!(await this.albumSaved())) return;
     if (this.fossils.unsaved) {
-      const k = await alert(this, 'Save changes to Fossils before Quitting?', ['Save', "Don't Save", 'Cancel'], 'caution');
-      if (k === 2 || (k === 0 && !(await this.saveFossils()))) return;
+      const k = await alert(this, 'Save changes to Fossils before Quitting?', SAVE_CHANGES, 'caution');
+      if (k === CANCEL || (k === SAVE && !(await this.saveFossils()))) return;
     }
     location.assign('../');
   }
@@ -749,9 +802,9 @@ export class App implements DialogHost {
   // The fossil record (Album unit: StartPlayBack, DoPlayBack, MyAction, ClosePlayBack).
 
   private async saveFossils(): Promise<boolean> {
-    const name = await putFile(this, this.disk, 'Save Fossils', this.fileNames.fossils, 'FOSS', this.fossils.records);
+    const name = await putFile(this, this.disk, 'Save Fossils', this.lastPutName, 'FOSS', this.fossils.records);
     if (!name) return false;
-    this.fileNames.fossils = name;
+    this.lastPutName = name;
     this.fossils.unsaved = false;
     return true;
   }
@@ -759,8 +812,8 @@ export class App implements DialogHost {
   /** Asks before an existing record is thrown away; false if the user cancelled. */
   private async fossilsMayReset(): Promise<boolean> {
     if (!this.fossils.exist) return true;
-    const k = await alert(this, 'Save changes to Fossils before Resetting?', ['Save', "Don't Save", 'Cancel'], 'caution');
-    return k === 1 || (k === 0 && (await this.saveFossils()));
+    const k = await alert(this, 'Save changes to Fossils before Resetting?', SAVE_CHANGES, 'caution');
+    return k === DONT_SAVE || (k === SAVE && (await this.saveFossils()));
   }
 
   private async initializeFossils() {
@@ -829,8 +882,9 @@ export class App implements DialogHost {
     this.showFossil();
   }
 
-  private closePlayback(revert: boolean) {
-    if (revert) this.children[this.special] = this.playback.first;
+  /** ClosePlayBack; deactivating the Fossils window (DoActivate) resets Child[special] to FirstBiomorph. */
+  private closePlayback() {
+    this.children[this.special] = this.playback.first;
     this.screen.restore(this.belowMenuBar, this.playback.under);
     this.mode = this.playback.saveMode;
     this.events.flush();
@@ -839,7 +893,7 @@ export class App implements DialogHost {
 
   private async breedFromFossil() {
     this.playback.first = this.playback.shown;
-    this.closePlayback(false);
+    this.closePlayback();
     this.fossils.recording = false;
     await this.doBreed();
   }
@@ -858,7 +912,7 @@ export class App implements DialogHost {
     const part = this.fossilWindow.partAt(x, y);
     if (part === 'drag') await this.dragFossilWindow(x, y);
     else if (part === 'goAway') {
-      if (await this.trackGoAway()) this.closePlayback(true);
+      if (await this.trackGoAway()) this.closePlayback();
     } else if (part === 'grow') await this.growFossilWindow();
     else if (part === 'up' || part === 'down') await this.trackArrow(part);
     else if (part === 'pageUp' || part === 'pageDown') await this.trackPage(part);
@@ -1003,7 +1057,7 @@ export class App implements DialogHost {
       {
         title: 'Exit',
         items: [
-          { label: 'Close Window', key: 'W', run: () => this.closePlayback(false) },
+          { label: 'Close Window', key: 'W', run: () => this.closePlayback() },
           { label: 'Breed from Current Fossil', key: 'B', run: () => this.breedFromFossil() },
           { label: 'Quit', key: 'Q', run: () => this.quit() },
         ],
@@ -1122,6 +1176,7 @@ export class App implements DialogHost {
         this,
         'Changing an anchor erases the present triangle and draws it again. Do you still want to change it?',
         ['Change', 'Cancel'],
+        'caution',
       );
       if (k !== 0) return;
       this.anchors[corner] = clone(this.active());
@@ -1170,7 +1225,6 @@ export class App implements DialogHost {
         this.pedigree.rays = rays;
       },
     });
-    /** Every command but Copy forgets that Copy was the last thing done (for Help). */
     const cmd = (item: MenuItem): MenuItem => ({
       ...item,
       run: item.run && (() => ((this.lastWasCopy = false), item.run!())),
@@ -1184,30 +1238,30 @@ export class App implements DialogHost {
           const place = { h: x, v: y - centringOffset(pic) };
           for (const l of placedLines(pic, place)) s.line(l);
         },
-        items: [{ label: 'About Blind Watchmaker…', run: () => this.about() }, null],
+        items: [{ label: 'About Blind Watchmaker', run: () => this.about() }, null],
       },
       {
         title: 'File',
         items: [
-          { label: 'Load to Album…', key: 'L', enabled: () => !this.album.full, run: () => this.loadToAlbum() },
-          { label: 'Load as Fossils…', key: 'O', run: () => this.loadAsFossils() },
-          { label: 'Save Biomorph…', enabled: alive, run: () => this.saveBiomorph() },
+          { label: 'Load to Album...', key: 'L', enabled: () => !this.album.full, run: () => this.loadToAlbum() },
+          { label: 'Load as Fossils...', key: 'O', run: () => this.loadAsFossils() },
+          { label: 'Save Biomorph...', enabled: alive, run: () => this.saveBiomorph() },
           {
-            label: 'Save Fossils…',
+            label: 'Save Fossils...',
             key: 'F',
             enabled: () => this.fossils.exist,
             run: async () => void (await this.saveFossils()),
           },
           {
-            label: 'Save Album…',
+            label: 'Save Album...',
             key: 'S',
             enabled: () => this.album.members().length > 0,
-            run: async () => void (await this.saveAlbum()),
+            run: async () => void (this.mode !== 'moving' && (await this.saveAlbum())),
           },
           {
             label: 'Close Album',
             key: 'W',
-            enabled: () => !this.album.isEmpty && inAlbum(),
+            enabled: () => this.album.members().length > 0 && inAlbum(),
             run: () => this.closeAlbum(),
           },
           { label: 'Quit', key: 'Q', run: () => this.quit() },
@@ -1253,7 +1307,7 @@ export class App implements DialogHost {
               ].includes(this.mode) && !this.album.full,
             run: () => this.addToAlbum(),
           },
-          { label: 'Show Album', enabled: () => !this.album.isEmpty, run: () => this.showAlbum() },
+          { label: 'Show Album', enabled: () => this.album.members().length > 0, run: () => this.showAlbum() },
         ],
       },
       {
@@ -1290,13 +1344,13 @@ export class App implements DialogHost {
         items: [
           {
             label: 'More Rows',
-            enabled: () => breedingish() && (this.grid.rows + 2) * this.grid.cols <= MAX_BOXES,
+            enabled: () => breedingish() && this.grid.n < MAX_BOXES,
             run: () => this.changeGrid(2, 0),
           },
           { label: 'Fewer Rows', enabled: () => breedingish() && this.grid.rows >= 3, run: () => this.changeGrid(-2, 0) },
           {
             label: 'More Columns',
-            enabled: () => breedingish() && this.grid.rows * (this.grid.cols + 2) <= MAX_BOXES,
+            enabled: () => breedingish() && this.grid.n < MAX_BOXES,
             run: () => this.changeGrid(0, 2),
           },
           {
@@ -1316,7 +1370,7 @@ export class App implements DialogHost {
             run: () => {
               this.sweep = !this.sweep;
               this.sweepSlot = 0;
-              if (this.mode === 'drifting') this.win.erase();
+              this.sweepFirst = true;
             },
           },
           anchor('Make top of triangle', 'top'),
@@ -1360,12 +1414,13 @@ export class App implements DialogHost {
             key: 'H',
             run: () => this.showHelp(this.lastWasCopy ? 'copy' : this.mode),
           },
-          { label: 'Miscellaneous Help', run: () => this.showHelp('misc') },
+          { label: 'Miscellaneous Help', run: () => this.showHelp(this.lastWasCopy ? 'copy' : 'misc') },
         ],
       },
     ];
+    const resetsCopy = ['Edit', 'Operation', 'View', 'Mutations'];
     return menus.map((m) =>
-      m.title === 'Help' ? m : { ...m, items: m.items.map((i) => (i && i.label !== 'Copy' ? cmd(i) : i)) },
+      resetsCopy.includes(m.title) ? { ...m, items: m.items.map((i) => (i && i.label !== 'Copy' ? cmd(i) : i)) } : m,
     );
   }
 }

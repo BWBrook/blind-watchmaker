@@ -21,6 +21,7 @@ export class Events {
   private queue: MacEvent[] = [];
   private cursor = '';
   private obscured = false;
+  private hidden = false;
   private frameWaiters: (() => void)[] = [];
 
   constructor(
@@ -44,7 +45,7 @@ export class Events {
     canvas.addEventListener('pointermove', (e) => {
       locate(e);
       this.moved = true;
-      if (this.obscured) {
+      if (this.obscured && !this.hidden) {
         this.obscured = false;
         canvas.style.cursor = this.cursor;
       }
@@ -83,7 +84,19 @@ export class Events {
 
   setCursor(css: string) {
     this.cursor = css;
-    if (!this.obscured) this.screen.canvas.style.cursor = css;
+    if (!this.obscured && !this.hidden) this.screen.canvas.style.cursor = css;
+  }
+
+  /** HideCursor/ShowCursor: unlike obscure(), moving the mouse does not bring the pointer back. */
+  hide() {
+    this.hidden = true;
+    this.screen.canvas.style.cursor = 'none';
+  }
+
+  show() {
+    this.hidden = false;
+    this.obscured = false;
+    this.screen.canvas.style.cursor = this.cursor;
   }
 
   /** ObscureCursor: hide the pointer until the mouse next moves. */

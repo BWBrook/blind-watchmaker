@@ -81,10 +81,6 @@ export const HELP: Record<string, { title: string; body: string[] }> = {
       'View > Drift Sweep shows the drifting lineage spread across the boxes instead of one picture at a time.',
     ],
   },
-  preliminary: {
-    title: 'ROWS AND COLUMNS',
-    body: ['The grid has changed size. Choose Breed from the Operation menu to start breeding in it.'],
-  },
   albuming: {
     title: 'ALBUM HELP',
     body: [

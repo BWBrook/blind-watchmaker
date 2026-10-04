@@ -1,6 +1,7 @@
 import { centringOffset, develop, type Line, placedLines, type Rect } from '../engine/develop';
 import type { Genome } from '../engine/genome';
 import { type MutationFlags, reproduce } from '../engine/mutate';
+import { atLeast, centreOf, inRect, inset, shrink16 } from './boxes';
 import { cursorCss, imageCursorCss } from './cursors';
 import type { Events } from './events';
 import type { MacWindow } from './macwindow';
@@ -29,18 +30,7 @@ export interface PedigreeHost {
   setPointer(css: string): void;
 }
 
-const inRect = (r: Rect, x: number, y: number) => x >= r.left && x < r.right && y >= r.top && y < r.bottom;
 const meets = (a: Rect, b: Rect) => a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
-const inset = (r: Rect, d: number): Rect => ({ left: r.left + d, top: r.top + d, right: r.right - d, bottom: r.bottom - d });
-const centreOf = (r: Rect) => ({ h: r.left + ((r.right - r.left) >> 1), v: r.top + ((r.bottom - r.top) >> 1) });
-
-/** AtLeast: grow the box by 3 px, then widen it to whole bytes (multiples of 8) on both sides. */
-function atLeast(r: Rect): Rect {
-  const o = inset(r, -3);
-  while (o.left % 8) o.left -= 1;
-  while (o.right % 8) o.right += 1;
-  return o;
-}
 
 /** Radiate: the drag point, its reflection through the centre, and the two quarter turns. */
 function radiate(c: { h: number; v: number }, goal: { x: number; y: number }, rays: number) {
@@ -182,11 +172,7 @@ export class Pedigree {
     const h = r.bottom - r.top;
     const scale = this.host.cursorScale();
     if (w <= 16 || h <= 16) return cursorCss('cross', scale);
-    const img = this.host.win.grab(r);
-    const bits = new Uint8Array(256);
-    for (let y = 0; y < 16; y++) {
-      for (let x = 0; x < 16; x++) bits[y * 16 + x] = img[Math.floor((y * h) / 16) * w + Math.floor((x * w) / 16)];
-    }
+    const bits = shrink16(this.host.win.grab(r), w, { left: 0, top: 0, right: w, bottom: h });
     return imageCursorCss(bits, scale);
   }
 

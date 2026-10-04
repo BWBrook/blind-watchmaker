@@ -369,6 +369,8 @@ Clicking in box j `[UI:HandleClick]`, `[Bio:Evolve]`:
 - Leave by choosing another operation; Breed uses the last sampled biomorph.
 - The manual says detached pedigree biomorphs ("Adams") become the anchors; v1.1 does not do this (anchors come only from the View items) `[Man]` vs `[Tri]`, `[Ped]`.
 
+Confirmed from a direct reading of `Triangle` and `Main` (2026-10-04): weights come from the left corner with k = round(200 * screen height / 340) = 201 on a 342-pixel screen, so the top and right corners sample about 99% of their anchors (the drawn corner biomorphs are near, not exact, copies). PlotTriangle concocts the blend at the click, re-centres it vertically on the click point, erases and frames its margin grown by 2 px (unclamped, so boxes can run off the window) and draws it progressively; it becomes the active biomorph. MainTriangle draws the outline, then plots the three corners, then restores the previously active biomorph. FlickerTriangle runs on every pass of the event loop: the blend under the pointer is drawn off screen centred in a square "nice box" (MakeNiceBox: square of the larger margin side, AtLeast, right + 1) and OwnCursor samples that box (inset 2) into the 16 x 16 pointer, even for small biomorphs in this mode. Make top/left/right of triangle while triangling asks (Change, Cancel) and redraws with the active biomorph (the last one stamped) as the anchor.
+
 ### 6.7 Albums
 
 Album capacity and layout `[Alb]`, `[Glob]`, `[Init]`:

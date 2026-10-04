@@ -35,6 +35,14 @@ export const HELP: Record<string, { title: string; body: string[] }> = {
     title: 'KILLING HELP',
     body: ['Click a biomorph with the gun to remove it and all its descendants.', 'WARNING: There is no Undo!'],
   },
+  triangling: {
+    title: 'TRIANGLE HELP',
+    body: [
+      "This samples genetic space (\"Biomorph Land\"). The three biomorphs at the corners are anchors; every point in between is a blend of their genes, weighted by how near the point is to each corner.",
+      'The pointer shows, in miniature, the biomorph you would get by clicking there. Click to draw it full size; it becomes the active biomorph. Points outside the triangle extrapolate beyond the anchors.',
+      'View > Make top, left or right of triangle replaces an anchor with the active biomorph.',
+    ],
+  },
   playingBack: {
     title: 'PLAYING BACK FOSSILS HELP',
     body: [

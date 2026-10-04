@@ -154,6 +154,22 @@ const SWELL_ORD: Swell[] = ['swell', 'same', 'shrink'];
 const SPOKES_ORD: Spokes[] = ['northOnly', 'nSouth', 'radial'];
 const clampTo = (x: number, lo: number, hi: number) => Math.min(Math.max(x, lo), hi);
 
+/**
+ * Triangle's weights for point m, measured from the left corner b, for a screen `screenHeight` pixels high
+ * (k = round(200 * H / 340): 201 on a 512 x 342 screen). r1 weights the top anchor, r2 the left, r3 the right.
+ * Points outside the triangle extrapolate.
+ */
+export function triangleWeights(
+  b: { h: number; v: number },
+  m: { h: number; v: number },
+  screenHeight: number,
+): [number, number, number] {
+  const k = pascalRound((200 * screenHeight) / 340);
+  const x = m.h - b.h;
+  const y = b.v - m.v;
+  return [y / k, (k - x - y / 2) / k, (x - y / 2) / k];
+}
+
 /** Triangle `Concoct`: weighted blend of three genomes (weights need not be in 0..1). */
 export function concoct(r: [number, number, number], a: Genome, b: Genome, c: Genome): Genome {
   const w = (f: (g: Genome) => number) => pascalRound(r[0] * f(a) + r[1] * f(b) + r[2] * f(c));

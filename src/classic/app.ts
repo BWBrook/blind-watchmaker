@@ -1,10 +1,19 @@
 import { centringOffset, develop, type Line, placedLines, type Rect } from '../engine/develop';
-import { basicTree, chess, clone, type Genome, insect, normalise } from '../engine/genome';
-import { defaultFlags, engineer, hopefulMonster, type MutationFlags, reproduce } from '../engine/mutate';
+import { basicTree, chess, clone, type Genome, insect, normalise, pascalRound } from '../engine/genome';
+import {
+  concoct,
+  defaultFlags,
+  engineer,
+  hopefulMonster,
+  type MutationFlags,
+  reproduce,
+  triangleWeights,
+} from '../engine/mutate';
 import { Bitmap } from '../engine/raster';
 import zoos from '../engine/zoos.json';
 import { Album, PER_PAGE } from './album';
-import { type CursorName, cursorCss } from './cursors';
+import { atLeast, centreOf, inset, shrink16 } from './boxes';
+import { type CursorName, cursorCss, imageCursorCss } from './cursors';
 import { alert, type DialogHost, help, plainBox } from './dialogs';
 import { Disk } from './disk';
 import { FossilRecord } from './fossils';
@@ -32,7 +41,8 @@ type Mode =
   | 'phyloging'
   | 'moving'
   | 'detaching'
-  | 'killing';
+  | 'killing'
+  | 'triangling';
 
 const PEDIGREE_MODES: Mode[] = ['phyloging', 'moving', 'detaching', 'killing'];
 
@@ -87,6 +97,14 @@ export class App implements DialogHost {
   private readonly pedigree: Pedigree;
   /** After the last Adam is shot there is no active biomorph (Special = 0) until one is made or chosen. */
   private bereft = false;
+  /** MainTriangle's corners (top, left, right), proportional to a 512 x 342 screen; window-local. */
+  private readonly corners = {
+    top: { h: pascalRound((234 * SCREEN_W) / 512), v: pascalRound((51 * SCREEN_H) / 342) },
+    left: { h: pascalRound((134 * SCREEN_W) / 512), v: pascalRound((250 * SCREEN_H) / 342) },
+    right: { h: pascalRound((333 * SCREEN_W) / 512), v: pascalRound((250 * SCREEN_H) / 342) },
+  };
+  private trianglePointer = '';
+  private triangleMouse = { x: -1, y: -1 };
   private cursorScale = 1;
   private cursorName: CursorName | '' = '';
 
@@ -225,6 +243,7 @@ export class App implements DialogHost {
     else if (this.mode === 'randoming') await this.newMonster();
     else if (this.mode === 'albuming') this.selectSlot(p.x, p.y);
     else if (PEDIGREE_MODES.includes(this.mode)) await this.pedigreeClick(p.x, p.y);
+    else if (this.mode === 'triangling') await this.plotTriangle({ h: p.x, v: p.y });
   }
 
   private async pedigreeClick(x: number, y: number) {
@@ -263,6 +282,11 @@ export class App implements DialogHost {
   }
 
   private adjustCursor(p: { x: number; y: number } | undefined) {
+    if (this.mode === 'triangling' && p) {
+      if (p.x !== this.triangleMouse.x || p.y !== this.triangleMouse.y) this.flickerTriangle({ h: p.x, v: p.y });
+      this.triangleMouse = p;
+      return;
+    }
     let name: CursorName = 'arrow';
     if (this.mode === 'playingBack') name = 'arrow';
     else if (p) {
@@ -1032,6 +1056,81 @@ export class App implements DialogHost {
     if (h) await help(this, h.title, h.body);
   }
 
+  // The Triangle (Triangle unit): sampling "Biomorph Land" between three anchors.
+
+  private concoctAt(m: { h: number; v: number }): Genome {
+    const w = triangleWeights(this.corners.left, m, SCREEN_H);
+    return concoct(w, this.anchors.top, this.anchors.left, this.anchors.right);
+  }
+
+  private async doTriangle() {
+    this.mode = 'triangling';
+    await this.mainTriangle();
+  }
+
+  /** MainTriangle: the outline, then the three anchors sampled at the corners; the active biomorph is kept. */
+  private async mainTriangle() {
+    const stored = this.active();
+    const { top, left, right } = this.corners;
+    this.trianglePointer = '';
+    this.triangleMouse = { x: -1, y: -1 };
+    this.win.erase();
+    for (const [p, q] of [
+      [top, left],
+      [left, right],
+      [right, top],
+    ]) this.win.line({ x0: p.h, y0: p.v, x1: q.h, y1: q.v, thick: 1 });
+    for (const corner of [top, left, right]) await this.plotTriangle(corner);
+    this.children[this.special] = stored;
+  }
+
+  /** PlotTriangle: the blend at m, centred vertically on m in an erased box 2 px larger than it, framed. */
+  private async plotTriangle(m: { h: number; v: number }) {
+    const pic = develop(this.concoctAt(m), { penSize: this.penSize });
+    const off = centringOffset(pic);
+    const k = pic.margin;
+    const box = inset({ left: m.h + k.left, top: m.v + k.top - off, right: m.h + k.right, bottom: m.v + k.bottom - off }, -2);
+    this.win.erase(box);
+    this.win.frame(box);
+    await this.drawSlowly(placedLines(pic, { h: m.h, v: m.v - off }), this.win.bounds);
+    this.children[this.special] = pic.genome;
+    this.bereft = false;
+  }
+
+  /** FlickerTriangle + CursSnap + OwnCursor: the pointer is the biomorph a click here would make, shrunk to 16 x 16. */
+  private flickerTriangle(m: { h: number; v: number }) {
+    const pic = develop(this.concoctAt(m), { penSize: this.penSize });
+    const k = pic.margin;
+    const side = Math.max(k.right - k.left, k.bottom - k.top);
+    const nice = atLeast({ left: 8, top: 8, right: 8 + side, bottom: 8 + side });
+    nice.right += 1;
+    const bm = new Bitmap(nice.right, nice.bottom);
+    const mid = centreOf(nice);
+    for (const l of placedLines(pic, { h: mid.h, v: mid.v - centringOffset(pic) })) bm.line(l);
+    const bits = shrink16(bm.bits, bm.width, inset(nice, 2));
+    const key = bits.join('');
+    if (key === this.trianglePointer) return;
+    this.trianglePointer = key;
+    this.cursorName = '';
+    this.events.setCursor(imageCursorCss(bits, this.cursorScale));
+  }
+
+  /** View > Make ... of triangle: silent unless the triangle is showing, when it asks and then redraws. */
+  private async setAnchor(corner: 'top' | 'left' | 'right') {
+    if (this.mode === 'triangling') {
+      const k = await alert(
+        this,
+        'Changing an anchor erases the present triangle and draws it again. Do you still want to change it?',
+        ['Change', 'Cancel'],
+      );
+      if (k !== 0) return;
+      this.anchors[corner] = clone(this.active());
+      await this.mainTriangle();
+      return;
+    }
+    this.anchors[corner] = clone(this.active());
+  }
+
   // Menus.
 
   private menus(): Menu[] {
@@ -1048,9 +1147,8 @@ export class App implements DialogHost {
     });
     const anchor = (label: string, corner: 'top' | 'left' | 'right'): MenuItem => ({
       label,
-      run: () => {
-        this.anchors[corner] = clone(this.active());
-      },
+      enabled: alive,
+      run: () => this.setAnchor(corner),
     });
     const later = (label: string, key?: string): MenuItem => ({ label, key });
     const alive = () => !this.bereft;
@@ -1143,9 +1241,16 @@ export class App implements DialogHost {
             label: 'Add Biomorph to Album',
             key: 'A',
             enabled: () =>
-              ['highlighting', 'engineering', 'breeding', 'randoming', 'phyloging', 'moving', 'detaching'].includes(
-                this.mode,
-              ) && !this.album.full,
+              [
+                'highlighting',
+                'engineering',
+                'triangling',
+                'breeding',
+                'randoming',
+                'phyloging',
+                'moving',
+                'detaching',
+              ].includes(this.mode) && !this.album.full,
             run: () => this.addToAlbum(),
           },
           { label: 'Show Album', enabled: () => !this.album.isEmpty, run: () => this.showAlbum() },
@@ -1177,7 +1282,7 @@ export class App implements DialogHost {
               this.fossils.recording = !this.fossils.recording;
             },
           },
-          later('Triangle', 'T'),
+          { label: 'Triangle', key: 'T', run: () => this.doTriangle() },
         ],
       },
       {

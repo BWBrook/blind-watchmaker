@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { centringOffset, develop } from './develop';
 import { decodeRecords, encodeRecords } from './fileformat';
 import { basicTree, chess, type Genome, insect } from './genome';
-import { reproduce } from './mutate';
+import { reproduce, triangleWeights } from './mutate';
 import zoos from './zoos.json';
 
 const asRect = (m: { left: number; top: number; right: number; bottom: number }) => [m.left, m.top, m.right, m.bottom];
@@ -57,4 +57,12 @@ it('with every mutation switch off, only genes 1-9 change', () => {
     gene.slice(0, 8).forEach((x, j) => expect(Math.abs(x - pg[j]) % parent.mutSize).toBe(0));
     expect(Math.abs(gene[8] - pg[8])).toBeLessThanOrEqual(1);
   }
+});
+
+it('triangle weights: exact at the left corner, 199/201 at the top (k = 201 on a 342-pixel screen)', () => {
+  const left = { h: 134, v: 250 };
+  expect(triangleWeights(left, left, 342)).toEqual([0, 1, 0]);
+  const [r1, r2, r3] = triangleWeights(left, { h: 234, v: 51 }, 342);
+  expect(r1).toBeCloseTo(199 / 201);
+  expect(r1 + r2 + r3).toBeCloseTo(1);
 });

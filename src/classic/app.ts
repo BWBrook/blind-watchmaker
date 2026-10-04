@@ -14,6 +14,7 @@ import { drawGeneBox, drawStrip, geneZone } from './genestrip';
 import { Grid } from './grid';
 import { HELP } from './helptext';
 import { MacWindow } from './macwindow';
+import { Pedigree } from './pedigree';
 import { BAR_H, type Menu, MenuBar, type MenuItem } from './menubar';
 import { SCREEN_H, SCREEN_W, type Screen } from './screen';
 import { beep } from './sound';
@@ -27,7 +28,13 @@ type Mode =
   | 'randoming'
   | 'drifting'
   | 'albuming'
-  | 'playingBack';
+  | 'playingBack'
+  | 'phyloging'
+  | 'moving'
+  | 'detaching'
+  | 'killing';
+
+const PEDIGREE_MODES: Mode[] = ['phyloging', 'moving', 'detaching', 'killing'];
 
 /** Progressive drawing speed: placed lines per tick (the original was bound by 1980s hardware). */
 const LINES_PER_TICK = 48;
@@ -77,6 +84,9 @@ export class App implements DialogHost {
     under: new Uint8Array(),
   };
   private fullMenus: Menu[] = [];
+  private readonly pedigree: Pedigree;
+  /** After the last Adam is shot there is no active biomorph (Special = 0) until one is made or chosen. */
+  private bereft = false;
   private cursorScale = 1;
   private cursorName: CursorName | '' = '';
 
@@ -88,6 +98,22 @@ export class App implements DialogHost {
     this.grid = new Grid(3, 5, this.win.width, this.win.height);
     this.albumGrid = new Grid(3, 5, this.win.width, this.win.height);
     this.fossilWindow = new FossilWindow(screen);
+    this.pedigree = new Pedigree({
+      events,
+      win: this.win,
+      penSize: () => this.penSize,
+      flags: () => this.flags,
+      cursorScale: () => this.cursorScale,
+      drawSlowly: (lines, clip) => this.drawSlowly(lines, clip),
+      activate: (g) => {
+        this.children[this.special] = g;
+        this.bereft = false;
+      },
+      setPointer: (css) => {
+        this.events.setCursor(css);
+        this.cursorName = '';
+      },
+    });
     this.fullMenus = this.menus();
     this.menubar = new MenuBar(screen, events, this.fullMenus);
   }
@@ -127,6 +153,7 @@ export class App implements DialogHost {
   }
 
   private setActive(g: Genome) {
+    this.bereft = false;
     this.children = Array(this.grid.n);
     this.children[this.grid.mid] = g;
     this.special = this.grid.mid;
@@ -197,6 +224,25 @@ export class App implements DialogHost {
     } else if (this.mode === 'engineering') await this.engineerClick(p.x, p.y);
     else if (this.mode === 'randoming') await this.newMonster();
     else if (this.mode === 'albuming') this.selectSlot(p.x, p.y);
+    else if (PEDIGREE_MODES.includes(this.mode)) await this.pedigreeClick(p.x, p.y);
+  }
+
+  private async pedigreeClick(x: number, y: number) {
+    const f = this.pedigree.hit(x, y);
+    if (!f) return;
+    if (this.mode === 'phyloging') await this.pedigree.drawOut(f);
+    else if (this.mode === 'moving') await this.pedigree.follow(f);
+    else if (this.mode === 'detaching') this.pedigree.detach(f);
+    else if (this.pedigree.shoot(f)) {
+      this.mode = 'preliminary';
+      this.bereft = true;
+    }
+    this.cursorName = '';
+  }
+
+  private async displayPedigree() {
+    await this.pedigree.newAdam(this.active());
+    this.mode = 'phyloging';
   }
 
   private async idle() {
@@ -222,6 +268,10 @@ export class App implements DialogHost {
     else if (p) {
       if (this.mode === 'randoming') name = 'die';
       else if (this.mode === 'highlighting' || this.mode === 'albuming') name = 'block';
+      else if (this.mode === 'phyloging') name = 'drawOut';
+      else if (this.mode === 'moving') name = 'hand';
+      else if (this.mode === 'detaching') name = 'scissors';
+      else if (this.mode === 'killing') name = 'gun';
       else if (this.mode === 'engineering') {
         const z = geneZone(this.win, p.x, p.y);
         const graded = z && (z.box <= 9 || z.box === 11);
@@ -1003,6 +1053,25 @@ export class App implements DialogHost {
       },
     });
     const later = (label: string, key?: string): MenuItem => ({ label, key });
+    const alive = () => !this.bereft;
+    const inPedigree = () => PEDIGREE_MODES.includes(this.mode);
+    const pedigreeMode = (label: string, key: string, mode: Mode): MenuItem => ({
+      label,
+      key,
+      enabled: inPedigree,
+      run: () => {
+        this.mode = mode;
+      },
+    });
+    const mirrors = (label: string, key: string, rays: number): MenuItem => ({
+      label,
+      key,
+      enabled: () => this.mode === 'phyloging',
+      checked: () => this.pedigree.rays === rays,
+      run: () => {
+        this.pedigree.rays = rays;
+      },
+    });
     /** Every command but Copy forgets that Copy was the last thing done (for Help). */
     const cmd = (item: MenuItem): MenuItem => ({
       ...item,
@@ -1024,7 +1093,7 @@ export class App implements DialogHost {
         items: [
           { label: 'Load to Album…', key: 'L', enabled: () => !this.album.full, run: () => this.loadToAlbum() },
           { label: 'Load as Fossils…', key: 'O', run: () => this.loadAsFossils() },
-          { label: 'Save Biomorph…', run: () => this.saveBiomorph() },
+          { label: 'Save Biomorph…', enabled: alive, run: () => this.saveBiomorph() },
           {
             label: 'Save Fossils…',
             key: 'F',
@@ -1052,7 +1121,7 @@ export class App implements DialogHost {
           later('Undo', 'Z'),
           null,
           later('Cut', 'X'),
-          { label: 'Copy', key: 'C', run: () => this.copyBiomorph() },
+          { label: 'Copy', key: 'C', enabled: alive, run: () => this.copyBiomorph() },
           {
             label: 'Paste',
             key: 'V',
@@ -1074,7 +1143,9 @@ export class App implements DialogHost {
             label: 'Add Biomorph to Album',
             key: 'A',
             enabled: () =>
-              ['highlighting', 'engineering', 'breeding', 'randoming'].includes(this.mode) && !this.album.full,
+              ['highlighting', 'engineering', 'breeding', 'randoming', 'phyloging', 'moving', 'detaching'].includes(
+                this.mode,
+              ) && !this.album.full,
             run: () => this.addToAlbum(),
           },
           { label: 'Show Album', enabled: () => !this.album.isEmpty, run: () => this.showAlbum() },
@@ -1083,9 +1154,9 @@ export class App implements DialogHost {
       {
         title: 'Operation',
         items: [
-          { label: 'Breed', key: 'B', run: () => this.doBreed() },
-          { label: 'Drift', key: 'D', run: () => this.doDrift() },
-          { label: 'Engineering', key: 'E', run: () => this.doEngineer() },
+          { label: 'Breed', key: 'B', enabled: alive, run: () => this.doBreed() },
+          { label: 'Drift', key: 'D', enabled: alive, run: () => this.doDrift() },
+          { label: 'Engineering', key: 'E', enabled: alive, run: () => this.doEngineer() },
           { label: 'Hopeful Monster', key: 'M', run: () => this.doMonster() },
           {
             label: () => (this.fossils.exist ? 'Reinitialize Fossil Record' : 'Initialize Fossil Record'),
@@ -1164,16 +1235,16 @@ export class App implements DialogHost {
       {
         title: 'Pedigree',
         items: [
-          later('Display pedigree', '1'),
+          { label: 'Display pedigree', key: '1', enabled: alive, run: () => this.displayPedigree() },
           null,
-          later('Draw Out Offspring', '2'),
-          later('No Mirrors', '3'),
-          later('Single Mirror', '4'),
-          later('Double Mirrors', '5'),
+          pedigreeMode('Draw Out Offspring', '2', 'phyloging'),
+          mirrors('No Mirrors', '3', 1),
+          mirrors('Single Mirror', '4', 2),
+          mirrors('Double Mirrors', '5', 4),
           null,
-          later('Move', '6'),
-          later('Detach', '7'),
-          later('Kill', '8'),
+          pedigreeMode('Move', '6', 'moving'),
+          pedigreeMode('Detach', '7', 'detaching'),
+          pedigreeMode('Kill', '8', 'killing'),
         ],
       },
       {

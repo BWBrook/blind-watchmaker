@@ -1,4 +1,4 @@
-/** 1-bit pointers drawn for this recreation ('#' = black); each gets an automatic 1 px white outline. */
+/** 1-bit pointers drawn for this recreation ('#' black, '.' white); each also gets an automatic 1 px white outline. */
 interface CursorDef {
   rows: string[];
   hot: [number, number];
@@ -53,6 +53,26 @@ const DEFS = {
     hot: [7, 7],
     rows: ['', '', '', '', '', '#', '# ##########', '####  #  #  ######', '# ##########', '#'],
   },
+  hand: {
+    hot: [5, 0],
+    rows: ['    ##', '   #..#', '   #..#', '   #..#', '   #..###', '   #..#..###', '## #..#..#..#', '#..##........#', '#...#........#', ' #...........#', '  #..........#', '  #.........#', '   #........#', '    #......#', '    #......#', '    ########'],
+  },
+  drawOut: {
+    hot: [5, 0],
+    rows: ['    ##', '   #..#', '   #..#', '   #..#', '   #..###', '   #..#..###', '## #..#..#..#', '#..##........#', '#...#........#', ' #...........#', '  #..........#', '  #.........#', '   #........#', '    #......#', '    #......#', '    ########', '              #', '               #', '                #'],
+  },
+  scissors: {
+    hot: [12, 1],
+    rows: ['', ' ##', '#..#     ##', '#..#   ##', ' ## ###', '    ###', ' ## ###', '#..#   ##', '#..#     ##', ' ##'],
+  },
+  gun: {
+    hot: [0, 4],
+    rows: ['', '', '', '  ###########', '##...........#', '##############', '      #..#...#', '      #.#.#..#', '      ##..#..#', '          #..#', '          #..#', '          ####'],
+  },
+  dot: {
+    hot: [8, 8],
+    rows: ['', '', '', '', '', '', '', '', '        #'],
+  },
   block: {
     hot: [8, 8],
     rows: ['', '', '', '', '', '    ########', '    ########', '    ########', '    ########', '    ########', '    ########', '    ########', '    ########', '    ########', '    ########', '    ########'],
@@ -97,6 +117,18 @@ const DEFS = {
 
 export type CursorName = keyof typeof DEFS | 'none';
 
+/** A pointer made from a 16 x 16 image (opaque, hot spot in the middle), as OwnCursor builds from a biomorph box. */
+export function imageCursorCss(bits: Uint8Array, scale: number): string {
+  const c = document.createElement('canvas');
+  c.width = c.height = 16 * scale;
+  const ctx = c.getContext('2d')!;
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#000';
+  for (let i = 0; i < 256; i++) if (bits[i]) ctx.fillRect((i % 16) * scale, Math.floor(i / 16) * scale, scale, scale);
+  return `url(${c.toDataURL()}) ${8 * scale} ${8 * scale}, crosshair`;
+}
+
 const cache = new Map<string, string>();
 
 /** CSS `cursor` value for a pointer at the given integer screen scale. */
@@ -115,6 +147,7 @@ export function cursorCss(name: CursorName, scale: number): string {
     for (let x = 0; x < size; x++) {
       let colour: string | undefined;
       if (black(x, y)) colour = '#000';
+      else if (def.rows[y]?.[x] === '.') colour = '#fff';
       else if ([-1, 0, 1].some((dy) => [-1, 0, 1].some((dx) => black(x + dx, y + dy)))) colour = '#fff';
       if (!colour) continue;
       ctx.fillStyle = colour;

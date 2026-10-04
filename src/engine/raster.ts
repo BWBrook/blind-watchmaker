@@ -26,10 +26,12 @@ export class Bitmap {
     this.fill({ left: right - size, top, right, bottom }, 1, clip);
   }
 
-  line(l: Line, clip?: Rect, pen: Pen = 'black') {
+  /** `exclude` lists rectangles the line must not touch (QuickDraw clipping to a region with holes). */
+  line(l: Line, clip?: Rect, pen: Pen = 'black', exclude: Rect[] = []) {
     const c = intersect(clip ?? this.bounds(), this.bounds());
     const t = l.thick;
     const stamp = (x: number, y: number) => {
+      if (exclude.some((r) => x >= r.left && x < r.right && y >= r.top && y < r.bottom)) return;
       const x0 = Math.max(x, c.left);
       const x1 = Math.min(x + t, c.right);
       if (x0 >= x1) return;

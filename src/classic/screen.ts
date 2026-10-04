@@ -50,8 +50,30 @@ export class Screen {
     this.dirty = true;
   }
 
-  line(l: Line, clip?: Rect, pen: Pen = 'black') {
-    this.bitmap.line(l, clip, pen);
+  line(l: Line, clip?: Rect, pen: Pen = 'black', exclude: Rect[] = []) {
+    this.bitmap.line(l, clip, pen, exclude);
+    this.dirty = true;
+  }
+
+  /** The pixels of r (0 where r leaves the screen). */
+  grab(r: Rect): Uint8Array {
+    const bm = this.bitmap;
+    const w = r.right - r.left;
+    const out = new Uint8Array(w * (r.bottom - r.top));
+    for (let y = Math.max(r.top, 0); y < Math.min(r.bottom, bm.height); y++) {
+      for (let x = Math.max(r.left, 0); x < Math.min(r.right, bm.width); x++) out[(y - r.top) * w + x - r.left] = bm.bits[y * bm.width + x];
+    }
+    return out;
+  }
+
+  /** CopyBits a grabbed image back into r, clipped. */
+  put(r: Rect, data: Uint8Array, clip?: Rect) {
+    const bm = this.bitmap;
+    const c = intersect(intersect(r, clip ?? bm.bounds()), bm.bounds());
+    const w = r.right - r.left;
+    for (let y = c.top; y < c.bottom; y++) {
+      for (let x = c.left; x < c.right; x++) bm.bits[y * bm.width + x] = data[(y - r.top) * w + x - r.left];
+    }
     this.dirty = true;
   }
 

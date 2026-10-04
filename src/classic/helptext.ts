@@ -10,6 +10,31 @@ export const HELP: Record<string, { title: string; body: string[] }> = {
       'To keep a record of your choices, choose Operation > Initialize Fossil Record before you start; Play Back Fossils shows it.',
     ],
   },
+  phyloging: {
+    title: 'PEDIGREE HELP',
+    body: [
+      'Press in a biomorph box and drag outwards: an umbilical cord follows the pointer. Let go, and a mutant offspring is born where the cord ends, joined to its parent by a line.',
+      'Pedigree > Single Mirror and Double Mirrors draw out two or four cords at once, giving two or four offspring.',
+      'Keep drawing out from parents and children to grow a family tree. Move, Detach and Kill (also in the Pedigree menu) rearrange it. A double border marks an Adam: a biomorph with no parent.',
+    ],
+  },
+  moving: {
+    title: 'MOVING HELP',
+    body: [
+      'Drag a biomorph box to rearrange the pedigree. This changes nothing biological: lines to parents and offspring follow the box.',
+      'Boxes behave like small windows: they can be stacked on top of one another, and the one you touch comes to the front.',
+    ],
+  },
+  detaching: {
+    title: 'DETACHING HELP',
+    body: [
+      'Click a biomorph with the scissors to cut it, and all its descendants, from its parent. It becomes a new Adam (double border).',
+    ],
+  },
+  killing: {
+    title: 'KILLING HELP',
+    body: ['Click a biomorph with the gun to remove it and all its descendants.', 'WARNING: There is no Undo!'],
+  },
   playingBack: {
     title: 'PLAYING BACK FOSSILS HELP',
     body: [

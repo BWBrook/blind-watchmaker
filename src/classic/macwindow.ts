@@ -78,10 +78,24 @@ export class MacWindow {
     this.screen.invert(this.clip(r));
   }
 
-  line(l: Line, clip?: Rect, pen: Pen = 'black') {
+  line(l: Line, clip?: Rect, pen: Pen = 'black', exclude: Rect[] = []) {
     const dx = MacWindow.LEFT;
     const dy = MacWindow.TOP;
-    this.screen.line({ ...l, x0: l.x0 + dx, y0: l.y0 + dy, x1: l.x1 + dx, y1: l.y1 + dy }, this.clip(clip), pen);
+    const l2 = { ...l, x0: l.x0 + dx, y0: l.y0 + dy, x1: l.x1 + dx, y1: l.y1 + dy };
+    this.screen.line(l2, this.clip(clip), pen, exclude.map((r) => this.g(r)));
+  }
+
+  grab(r: Rect): Uint8Array {
+    return this.screen.grab(this.g(r));
+  }
+
+  put(r: Rect, data: Uint8Array) {
+    this.screen.put(this.g(r), data, this.clip());
+  }
+
+  /** The window-local point under a global one, whether or not it is inside the window. */
+  toLocal(x: number, y: number) {
+    return { x: x - MacWindow.LEFT, y: y - MacWindow.TOP };
   }
 
   text(t: string, x: number, y: number, font: FontName = 'Geneva', clip?: Rect) {
